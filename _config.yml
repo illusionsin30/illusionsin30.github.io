@@ -4,3 +4,4 @@ plugins:
 title: Mumu
 description: A personal workspace for casual notes on machine learning.
 show_downloads: false
+theme: jekyll-theme-minimal
