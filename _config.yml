@@ -5,4 +5,9 @@ title: Mumu
 description: A personal workspace for casual notes on machine learning.
 show_downloads: false
 theme: jekyll-theme-minimal
-
+kramdown:
+  math_engine: katex
+  math_engine_opts:
+    throw_on_error: false
+  parse_block_html: true
+  input: GFM

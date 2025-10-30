@@ -54,7 +54,7 @@ $$
     \log p_\theta(x_0) = \log \int q(x_{1:T} | x_0) \frac{p_\theta(x_{0:T})}{q(x_{1:T} | x_0)} dx_{1:T} \geq \mathbb{E}_{q(x_{1:T} | x_0)} \left[ \log \frac{p_\theta(x_{0:T})}{q(x_{1:T} | x_0)} \right]
 $$
 
-带入先前推导的 $p_\theta (x_{t-1} | x_t), q(x_t | x_{t-1})$ 那么扩散模型的对数似然函数形式可以展开为以下形式，此处采用 DDPM 论文中的化简版本 *(Ho et al., 2020)*:
+带入先前推导的 $p_\theta (x_{t-1}|x_t), q(x_t|x_{t-1})$ 那么扩散模型的对数似然函数形式可以展开为以下形式，此处采用 DDPM 论文中的化简版本 *(Ho et al., 2020)*:
 
 $$
     \mathcal{L}(\theta) = \mathbb{E}_q \left[ D_{KL}(q(x_T | x_0) \parallel p(x_T)) + \sum_{t>1} D_{KL} (q(x_{t-1} | x_t, x_0) \parallel p_\theta (x_{t-1} | x_t)) - \log p_\theta (x_0 | x_1)\right]
@@ -78,7 +78,7 @@ $$
 \sum_{t>1} D_{KL} (q(x_{t-1}|x_t, x_0) \parallel p_\theta (x_{t-1}|x_t))
 $$
 
-表示加燥过程第 $t$ 时间步的数据与反向预测生成数据 p(x_{t-1}|x_t) 的差异, 最后一项 
+表示加燥过程第 $t$ 时间步的数据与反向预测生成数据 $p(x_{t-1}|x_t)$ 的差异, 最后一项 
 
 $$
 \log p_\theta(x_0|x_1)
