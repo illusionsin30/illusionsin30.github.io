@@ -11,25 +11,35 @@ DiT 基于 Diffusion probabilistic models 和 Transformer 架构，通过在 DiT
 
 ### DDPM
 扩散模型主要基于数理统计与随机过程知识建立。Gaussian diffusion models 假定**前向传播过程** (forward) 是逐步向真实数据引入噪声的过程，其中各个时间步 $t$ 下的数据分布 $\{x_t\}_{t=1}^T$ 满足马尔可夫链的性质：
+
 $$
     q(x_1, x_2, \cdots, x_T | x_0) = \overset{T}{\underset{t=1}{\prod}}q(x_t | x_{t-1})
 $$
+
 其中 $x_0$ 为初始数据，也就是真实数据。引入噪声的过程可以记作
+
 $$
     x_0: q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t) \bm{I})
 $$
+
 也可以写作
+
 $$
     q(x_t | x_{t-1}) = \mathcal(N)(\sqrt{1-\beta_t} x_{t-1}, \beta_t \bm{I})
 $$
+
 其中 $\bar{\alpha}_t, \beta_t$ 是相关的**超参数** (hyperparameters)，二者的关系是 $\bar{\alpha}_t = \overset{t}{\underset{s=1}{\prod}} (1-\beta_s)$。基于以上假设，并对数据或者说是样本进行**重整化** (reparameterization) 后，可以将样本写作
+
 $$
     x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon_t, \text{ where } \epsilon_t \sim \mathcal{N}(0, \bm{I})
 $$
+
 这里的 $\epsilon$ 就是所谓的“噪声”，即服从**标准正态分布**的变量。而 Diffusion models 就在训练中学习反向传播过程，即如何去去除 $\epsilon$ 的影响，恢复前一步的图像：
+
 $$
     p_{\theta}(x_{t-1} | x_t) = \mathcal{N}(\mu_{\theta}(x_t, t), \sum_\theta(x_t, t))
 $$
+
 其中 $p_\theta$ 就是神经网络需要预测的统计分布。这样操作下，扩散模型实质上就是逼近一个建立在**马尔可夫随机过程** $\{ x_t \}_{t=0}^T$ 上的映射，这个映射可以通过一个行为模式 $x_{n}$ 预测得到前一个行为模式 $x_{n-1}$ 的概率分布。
 
 依据统计中最大似然的思想，结合数值分析中寻找极值点的思路，使得 $p_\theta$ 最大的参数 $\theta^* = \underset{\theta}{\max} \mathbb{E}_{q(x_0)}(p_\theta(x_0))$ 可以通过似然函数或是对数似然函数梯度下降来得到。扩散模型采用对数似然函数，其形式为
@@ -63,6 +73,7 @@ $$
 $$
     \mathcal{L}_{\text{simple}}  = \mathbb{E}_{x_0, \epsilon, t}\left[ \parallel \epsilon - \epsilon_\theta(x_t, t) \parallel^2 \right]
 $$
+
 其中 $\epsilon_\theta(x_t, t)$ 为模型预测的噪声。简化后的似然函数表示，只需要让模型学会 $t$ 时间步的噪声预测，即可学会去噪、还原干净样本。这步简化让扩散模型梯度下降训练具有可能性，是非常强大的优化。
 
 ## Transformers 
