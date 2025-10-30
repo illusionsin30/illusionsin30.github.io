@@ -66,7 +66,9 @@ $$
     D_{KL} (P \parallel Q) = \mathbb{E}_{x \sim P} \left[ \log \frac{P(x)}{Q(x)} \right], \text{ where } P, Q \text{ denote the statistics.}
 $$
 
-因而逐层分析对数似然函数，会发现其中每一项都具有一定意义：$D_{KL}(q(x_T | x_0) \parallel p(x_T))$ 表示加噪过程中第 $T$ 时间步的数据 $q(x_T|x_0)$ 与反向预测数据 $p(x_T)$ 的差异，$\sum_{t>1} D_{KL} (q(x_{t-1} | x_t, x_0) \parallel p_\theta (x_{t-1} | x_t))$ 表示加燥过程第 $t$ 时间步的数据与反向预测生成数据 p(x_{t-1} | x_t) 的差异，最后一项 $\log p_\theta(x_0 | x_1)$ 表示模型最后一步生成干净样本 $x_0$ 的能力.
+因而逐层分析对数似然函数，会发现其中每一项都具有一定意义
+
+$D_{KL}(q(x_T|x_0) \parallel p(x_T))$ 表示加噪过程中第 $T$ 时间步的数据 $q(x_T|x_0)$ 与反向预测数据 $p(x_T)$ 的差异，$\sum_{t>1} D_{KL} (q(x_{t-1}|x_t, x_0) \parallel p_\theta (x_{t-1}|x_t))$ 表示加燥过程第 $t$ 时间步的数据与反向预测生成数据 p(x_{t-1}|x_t) 的差异，最后一项 $\log p_\theta(x_0|x_1)$ 表示模型最后一步生成干净样本 $x_0$ 的能力.
 
 在以上假设中，DPPM 将对数似然函数简化为以下版本：
 
