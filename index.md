@@ -10,7 +10,7 @@ layout: default
 
 # 笔记导航
 
-- [DiT模型代码学习笔记](./docs/DiT.html).
+- [DiT模型代码学习笔记](./DiT.html).
 
 目前很多笔记仍在进行中，主播努力学习ing...
 
