@@ -2,3 +2,26 @@
 ---
 
 @import "jekyll-theme-minimal";
+
+.katex {
+    font: normal 1em KaTeX_Main, Times New Roman, serif;
+    line-height: 1.2;
+    white-space: normal !important;
+  }
+  
+.katex-display {
+display: block;
+text-align: center;
+margin: 1em 0;
+overflow-x: auto;
+}
+
+.katex-display > .katex {
+display: inline-block;
+}
+
+.katex, .katex-display {
+background-color: #f9f9f9;
+padding: 0.2em 0.5em;
+border-radius: 0.2em;
+}
