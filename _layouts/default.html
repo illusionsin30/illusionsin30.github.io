@@ -23,23 +23,42 @@
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
 
     <!-- 5. KaTeX 数学公式支持 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyFAMyFwwPWvnO1sPp06Y8hJtJ8XcjF544DFF03+Rmw6Tgk+uSjhUEOTtEij7u" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<!-- ======================================================= -->
+<!-- KaTeX Official Implementation for Jekyll -->
+<!-- ======================================================= -->
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      renderMathInElement(document.body, {
-        delimiters: [
-          {left: "$$", right: "$$", display: true},
-          {left: "$", right: "$", display: false},
-          {left: "\\[", right: "\\]", display: true},
-          {left: "\\(", right: "\\)", display: false}
-        ],
-        throwOnError: false
-      });
+<!-- 1. 引入 CSS 样式表 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+<!-- 2. 引入 KaTeX 核心 JS -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyFAMyFwwPWvnO1sPp06Y8hJtJ8XcjF544DFF03+Rmw6Tgk+uSjhUEOTtEij7u" crossorigin="anonymous"></script>
+
+<!-- 3. 引入自动渲染插件 (Auto-render extension) -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+<!-- 4. 配置并启动渲染 -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      // 官方文档推荐的定界符配置
+      delimiters: [
+        // --- 块级公式 (Display Mode) ---
+        {left: "$$", right: "$$", display: true},
+        {left: "\\[", right: "\\]", display: true}, // 标准 LaTeX 写法
+        {left: "\\\\[", right: "\\\\]", display: true}, // 兼容 Jekyll 强制转义的情况
+
+        // --- 行内公式 (Inline Mode) ---
+        {left: "$", right: "$", display: false},
+        {left: "\\(", right: "\\)", display: false}, // 标准 LaTeX 写法
+        {left: "\\\\(", right: "\\\\)", display: false} // 兼容 Jekyll 强制转义的情况
+      ],
+      // 忽略不需要渲染的标签
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      // 报错时不抛出异常，而是显示原始公式，体验更好
+      throwOnError: false
     });
-    </script>
+  });
+</script>
     
     {% include head-custom.html %}
   </head>
