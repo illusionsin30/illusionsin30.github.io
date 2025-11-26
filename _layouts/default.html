@@ -36,25 +36,52 @@
 <!-- 3. 引入自动渲染插件 (Auto-render extension) -->
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 
-<!-- 4. 配置并启动渲染 -->
+<!-- 4. 配置并启动渲染 (修正版：兼容 Kramdown) -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-      // 官方文档推荐的定界符配置
-      delimiters: [
-        // --- 块级公式 (Display Mode) ---
-        {left: "$$", right: "$$", display: true},
-        {left: "\\[", right: "\\]", display: true}, // 标准 LaTeX 写法
-        {left: "\\\\[", right: "\\\\]", display: true}, // 兼容 Jekyll 强制转义的情况
+    
+    // --- 第一部分：处理 Kramdown 生成的 Script 标签 ---
+    // Kramdown 把行内公式放在 <script type="math/tex"> 中
+    // 把块级公式放在 <script type="math/tex; mode=display"> 中
+    // 我们需要把它们找出来，手动喂给 KaTeX
+    
+    var mathjaxScripts = document.querySelectorAll('script[type^="math/tex"]');
+    
+    mathjaxScripts.forEach(function(script) {
+      var tex = script.textContent || script.innerText;
+      var displayMode = script.type.indexOf('mode=display') !== -1;
+      
+      // 创建一个用来存放渲染结果的 span
+      var newNode = document.createElement("span");
+      if (displayMode) {
+        newNode.style.display = "block";
+        newNode.style.textAlign = "center";
+      }
+      
+      try {
+        // 直接调用 KaTeX 渲染 API
+        katex.render(tex, newNode, {
+          displayMode: displayMode,
+          throwOnError: false
+        });
+        // 用渲染好的节点替换掉原来的 script 标签
+        script.parentNode.replaceChild(newNode, script);
+      } catch (error) {
+        console.error("KaTeX rendering error:", error);
+      }
+    });
 
-        // --- 行内公式 (Inline Mode) ---
+    // --- 第二部分：启动 Auto-render (兜底) ---
+    // 这部分保留是为了渲染那些你可能直接写在 HTML 文件里的 $...$ 
+    // 或者其他没有被 Kramdown 捕捉到的公式
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "\\[", right: "\\]", display: true},
         {left: "$", right: "$", display: false},
-        {left: "\\(", right: "\\)", display: false}, // 标准 LaTeX 写法
-        {left: "\\\\(", right: "\\\\)", display: false} // 兼容 Jekyll 强制转义的情况
+        {left: "\\(", right: "\\)", display: false}
       ],
-      // 忽略不需要渲染的标签
       ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
-      // 报错时不抛出异常，而是显示原始公式，体验更好
       throwOnError: false
     });
   });
