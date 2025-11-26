@@ -32,7 +32,7 @@ markdown: kramdown
 kramdown:
   input: GFM             # GitHub Flavored Markdown
   hard_wrap: false       # 设为 false，防止换行符变成 <br>，导致公式断裂
-  math_engine: null      # 重要：设为 null，让 Kramdown 不要处理数学公式，
+  math_engine: mathjax
 
 # 永久链接格式 (推荐)
 permalink: /:year/:month/:day/:title/
