@@ -1,5 +1,7 @@
 ---
 layout: default
+title: DiT
+permalink: /docs/DiT
 ---
 
 # DiT 模型架构与代码学习笔记
