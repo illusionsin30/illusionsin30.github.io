@@ -3,7 +3,7 @@ name: Build and Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # 或者 main，看你的主分支叫什么
+      - main 
   workflow_dispatch:
 
 permissions:
