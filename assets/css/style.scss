@@ -64,3 +64,109 @@ li .katex {
     opacity: 0.95;
   }
 }
+
+/* =========================================
+   Default.html 美化补丁
+   ========================================= */
+
+/* 1. 字体升级 */
+body {
+  font-family: 'Lato', sans-serif; /* 正文使用 Lato */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif; /* 标题使用 Montserrat */
+  letter-spacing: -0.5px;
+}
+
+/* 2. 头像美化 (圆形 + 阴影) */
+.site-avatar img {
+  border-radius: 50%; /* 圆形 */
+  width: 120px;       /* 固定大小 */
+  height: 120px;
+  object-fit: cover;
+  border: 3px solid var(--bg-color, #fff); /* 适配暗色模式的边框 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 柔和阴影 */
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.site-avatar img:hover {
+  transform: scale(1.05) rotate(3deg); /* 鼠标悬停微动特效 */
+}
+
+/* 3. 头部排版 */
+.header-profile {
+  text-align: left; /* 保持左对齐 */
+}
+
+.site-title a {
+  color: var(--heading-color, #222);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-description {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+/* 4. 社交图标栏 (FontAwesome) */
+.social-links {
+  display: flex;
+  gap: 15px; /* 图标间距 */
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.social-links a {
+  color: var(--text-color, #555);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.05); /* 浅灰圆底 */
+  text-decoration: none !important; /* 强制去掉下划线 */
+}
+
+.social-links a:hover {
+  background: var(--link-color, #267CB9); /* 悬停变色 */
+  color: #fff;
+  transform: translateY(-2px); /* 上浮效果 */
+}
+
+/* 5. 按钮样式 (用于 View Project) */
+.btn-outline {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  border-color: var(--link-color);
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+/* 6. 页脚优化 */
+footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color, #eee);
+  font-size: 0.8rem;
+  color: #999;
+}
+
+footer a {
+  color: inherit;
+  text-decoration: underline;
+}
