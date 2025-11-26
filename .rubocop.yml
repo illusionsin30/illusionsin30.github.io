@@ -3,9 +3,12 @@ inherit_gem:
     - config/default.yml
 
 AllCops:
+  NewCops: enable # 启用新规则建议
   Exclude:
     - _site/**/*
     - vendor/**/*
+    - .github/**/* # 排除 Action 配置文件
+    - Gemfile.lock
 
 Layout/LineLength:
   Enabled: false
