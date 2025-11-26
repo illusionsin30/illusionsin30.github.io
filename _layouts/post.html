@@ -4,26 +4,35 @@ layout: default
 
 <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <!-- 1. 头部区域：包含标题、日期、作者 -->
+  <!-- 1. 头部区域：大标题 + 精致的元数据 -->
   <header class="post-header">
     <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
     
     <div class="post-meta">
-      <!-- 使用 time 标签和 machine-readable 格式，利于搜索引擎抓取 -->
-      <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-        {{ page.date | date: "%B %-d, %Y" }}
-      </time>
-      
-      <span class="meta-divider">•</span>
-      
-      <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-        <span itemprop="name">by {{ page.author | default: site.author }}</span>
+      <!-- 发布日期 -->
+      <span class="meta-item">
+        <i class="far fa-calendar-alt"></i>
+        <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ page.date | date: "%B %-d, %Y" }}
+        </time>
       </span>
+      
+      <!-- 作者 (仅在非默认作者时显示，保持简洁) -->
+      {% if page.author %}
+      <span class="meta-item">
+        <i class="far fa-user"></i>
+        <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <span itemprop="name">{{ page.author }}</span>
+        </span>
+      </span>
+      {% endif %}
 
-      <!-- 可选：添加预计阅读时间 -->
-      <span class="meta-divider">•</span>
-      <span class="reading-time" title="Estimated reading time">
-        {{ content | number_of_words | divided_by: 180 }} min read
+      <!-- 阅读时长估算 -->
+      <span class="meta-item">
+        <i class="far fa-clock"></i>
+        <span class="reading-time" title="Estimated reading time">
+          {{ content | number_of_words | divided_by: 180 | plus: 1 }} min read
+        </span>
       </span>
     </div>
   </header>
@@ -33,109 +42,213 @@ layout: default
     {{ content }}
   </div>
 
-  <!-- 3. 底部区域：标签与导航 -->
+  <!-- 3. 底部区域：标签 + 导航 -->
   <footer class="post-footer">
     
-    <!-- 优化的标签显示：美化为药丸形状 -->
+    <!-- 标签 (Tags) -->
     {% if page.tags.size > 0 %}
       <div class="post-tags">
-        <span class="tags-label">Tags:</span>
+        <i class="fas fa-tags tag-icon"></i>
         {% for tag in page.tags %}
-          <!-- 如果你有标签归档页，可以将 href 改为 /tags/#{{ tag | slugify }} -->
+          <!-- 使用 span 或 a 标签 -->
           <span class="tag-pill">{{ tag }}</span>
         {% endfor %}
       </div>
     {% endif %}
 
-    <!-- 4. 上一篇/下一篇 导航 -->
-    <div class="post-navigation">
-      {% if page.previous.url %}
-        <a class="prev" href="{{ page.previous.url | relative_url }}">
-          <small>« Previous</small><br>
-          {{ page.previous.title }}
-        </a>
-      {% else %}
-        <span></span> <!-- 占位符，保持 flex 布局平衡 -->
-      {% endif %}
+    <!-- 分割线 -->
+    <hr class="footer-divider">
 
-      {% if page.next.url %}
-        <a class="next" href="{{ page.next.url | relative_url }}">
-          <small>Next »</small><br>
-          {{ page.next.title }}
-        </a>
-      {% endif %}
-    </div>
+    <!-- 上一篇/下一篇 导航卡片 -->
+    <nav class="post-navigation">
+      <div class="nav-links">
+        {% if page.previous.url %}
+          <a class="nav-link prev" href="{{ page.previous.url | relative_url }}">
+            <div class="nav-label"><i class="fas fa-arrow-left"></i> Previous</div>
+            <div class="nav-title">{{ page.previous.title }}</div>
+          </a>
+        {% else %}
+          <div class="nav-link placeholder"></div>
+        {% endif %}
+
+        {% if page.next.url %}
+          <a class="nav-link next" href="{{ page.next.url | relative_url }}">
+            <div class="nav-label">Next <i class="fas fa-arrow-right"></i></div>
+            <div class="nav-title">{{ page.next.title }}</div>
+          </a>
+        {% endif %}
+      </div>
+    </nav>
 
   </footer>
 
 </article>
 
-<!-- 5. 配套 CSS (建议放入 assets/css/style.css，这里为了方便直接展示) -->
+<!-- 4. 配套 CSS (自动适配深色模式) -->
 <style>
-  /* 头部美化 */
+  /* ====================
+     Header Styling
+     ==================== */
   .post-header {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 1rem;
-  }
-  .post-title {
-    margin-bottom: 0.5rem;
-  }
-  .post-meta {
-    color: #666;
-    font-size: 0.9rem;
-  }
-  .meta-divider {
-    margin: 0 5px;
-    color: #ccc;
+    margin-bottom: 2.5rem;
+    text-align: left; /* 可改为 center */
   }
 
-  /* 正文优化：增加行高，提升阅读舒适度 */
+  .post-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+    color: var(--heading-color); /* 引用 style.css 变量 */
+    letter-spacing: -0.02em;
+  }
+
+  .post-meta {
+    font-family: 'Lato', sans-serif; /* 确保使用无衬线字体 */
+    color: var(--text-color);
+    opacity: 0.7; /* 让元数据稍微淡一点，突出层次感 */
+    font-size: 0.9rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* 元素间距 */
+    align-items: center;
+  }
+
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* 图标和文字的间距 */
+  }
+
+  .meta-item i {
+    font-size: 0.85em; /* 图标稍微小一点 */
+    opacity: 0.8;
+  }
+
+  /* ====================
+     Content Styling
+     ==================== */
   .post-content {
-    line-height: 1.8;
-    margin-bottom: 3rem;
+    line-height: 1.8; /* 黄金阅读行高 */
+    font-size: 1.05rem; /* 稍微调大字号 */
+    margin-bottom: 4rem;
+    color: var(--text-color);
   }
   
-  /* 标签美化 */
-  .post-tags {
-    margin-top: 2rem;
-    font-size: 0.85rem;
-  }
-  .tags-label {
-    font-weight: bold;
-    margin-right: 5px;
-    color: #555;
-  }
-  .tag-pill {
-    display: inline-block;
-    background: #f0f0f0;
-    color: #333;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-right: 5px;
-    margin-bottom: 5px;
+  /* 给正文里的标题增加呼吸感 */
+  .post-content h2 { margin-top: 2.5rem; }
+  .post-content h3 { margin-top: 2rem; }
+
+  /* ====================
+     Footer & Tags
+     ==================== */
+  .post-footer {
+    margin-top: 3rem;
   }
 
-  /* 底部导航 */
-  .post-navigation {
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .tag-icon {
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-right: 5px;
+  }
+
+  .tag-pill {
+    display: inline-block;
+    background: var(--code-bg, #f6f8fa); /* 适配深色模式背景 */
+    color: var(--text-color);
+    padding: 4px 12px;
+    border-radius: 50px; /* 胶囊形状 */
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--border-color, #eaeaea);
+    transition: all 0.2s ease;
+  }
+
+  .tag-pill:hover {
+    background: var(--link-color);
+    color: #fff;
+    border-color: var(--link-color);
+    transform: translateY(-1px);
+    cursor: default;
+  }
+
+  .footer-divider {
+    border: 0;
+    height: 1px;
+    background: var(--border-color);
+    margin: 2rem 0;
+    opacity: 0.5;
+  }
+
+  /* ====================
+     Navigation Cards
+     ==================== */
+  .nav-links {
     display: flex;
     justify-content: space-between;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
+    gap: 20px;
   }
-  .post-navigation a {
-    max-width: 45%;
-    text-decoration: none;
-    line-height: 1.4;
+
+  .nav-link {
+    flex: 1;
+    min-width: 0; /* 防止长标题撑开 flex 容器 */
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    background: transparent;
   }
-  .post-navigation .next {
-    text-align: right;
+
+  .nav-link:hover {
+    border-color: var(--link-color);
+    background: var(--code-bg); /* 轻微背景变化 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   }
-  .post-navigation small {
-    text-transform: uppercase;
-    color: #999;
+
+  /* 上一篇文字靠左，下一篇靠右 */
+  .nav-link.next { text-align: right; }
+
+  .nav-label {
     font-size: 0.75rem;
+    text-transform: uppercase;
     letter-spacing: 1px;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+
+  .nav-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--link-color);
+    line-height: 1.4;
+    /* 限制标题最多显示两行，超出省略 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .placeholder {
+    border: none;
+    pointer-events: none;
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 600px) {
+    .post-title { font-size: 1.8rem; }
+    .nav-links { flex-direction: column; }
+    .nav-link.next { text-align: left; } /* 手机上全部左对齐更易读 */
   }
 </style>
