@@ -1,27 +1,66 @@
 ---
 ---
 
+/* 1. 导入 Jekyll 默认主题 */
 @import "jekyll-theme-minimal";
 
+/* 2. KaTeX 数学公式优化 */
+
+/* 全局 KaTeX 设定 */
 .katex {
-    font: normal 1em KaTeX_Main, Times New Roman, serif;
-    line-height: 1.2;
-    white-space: normal !important;
+  font-size: 1.05em; /* 数学符号通常比正文小，稍微放大一点点更清晰 */
+  line-height: 1.2;
+}
+
+/* --- 行内公式 (Inline Math, e.g. $E=mc^2$) --- */
+/* 保持背景透明，不打断阅读流 */
+p .katex, 
+li .katex {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit; /* 跟随文字颜色 */
+}
+
+/* --- 块级公式 (Display Math, e.g. $$...$$) --- */
+/* 独立成块，增加背景色和滚动条 */
+.katex-display {
+  display: block;
+  margin: 1.5em 0;
+  padding: 1rem;
+  overflow-x: auto;     /* 允许横向滚动 */
+  overflow-y: hidden;
+  text-align: center;
+  border-radius: 6px;
+  
+  /* 适配我们之前定义的 CSS 变量，如果没有定义则使用默认值 */
+  background-color: var(--code-bg, #f6f8fa); 
+  border: 1px solid var(--border-color, #e5e5e5);
+}
+
+/* 块级公式内部的 wrapper，防止内容被截断 */
+.katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap; /* 强制不换行，触发滚动条 */
+  text-align: initial; /* 重置内部对齐 */
+}
+
+/* --- 3. 针对不同屏幕和模式的微调 --- */
+
+/* 强制覆盖 KaTeX 可能的换行问题 */
+.katex-html {
+  overflow: hidden;
+}
+
+/* 暗色模式适配 (如果你没有在全局 CSS 定义变量，这里手动兜底) */
+@media (prefers-color-scheme: dark) {
+  .katex-display {
+    background-color: #161b22; /* 深灰背景 */
+    border-color: #30363d;
   }
   
-.katex-display {
-display: block;
-text-align: center;
-margin: 1em 0;
-overflow-x: auto;
-}
-
-.katex-display > .katex {
-display: inline-block;
-}
-
-.katex, .katex-display {
-background-color: #f9f9f9;
-padding: 0.2em 0.5em;
-border-radius: 0.2em;
+  /* 略微降低公式亮度，防止在黑底上太刺眼 */
+  .katex {
+    opacity: 0.95;
+  }
 }

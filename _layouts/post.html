@@ -2,13 +2,140 @@
 layout: default
 ---
 
-<small>{{ page.date | date: "%-d %B %Y" }}</small>
-<h1>{{ page.title }}</h1>
+<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-<p class="view">by {{ page.author | default: site.author }}</p>
+  <!-- 1. 头部区域：包含标题、日期、作者 -->
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
+    
+    <div class="post-meta">
+      <!-- 使用 time 标签和 machine-readable 格式，利于搜索引擎抓取 -->
+      <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {{ page.date | date: "%B %-d, %Y" }}
+      </time>
+      
+      <span class="meta-divider">•</span>
+      
+      <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">by {{ page.author | default: site.author }}</span>
+      </span>
 
-{{content}}
+      <!-- 可选：添加预计阅读时间 -->
+      <span class="meta-divider">•</span>
+      <span class="reading-time" title="Estimated reading time">
+        {{ content | number_of_words | divided_by: 180 }} min read
+      </span>
+    </div>
+  </header>
 
-{% if page.tags %}
-  <small>tags: <em>{{ page.tags | join: "</em> - <em>" }}</em></small>
-{% endif %}
+  <!-- 2. 正文区域 -->
+  <div class="post-content" itemprop="articleBody">
+    {{ content }}
+  </div>
+
+  <!-- 3. 底部区域：标签与导航 -->
+  <footer class="post-footer">
+    
+    <!-- 优化的标签显示：美化为药丸形状 -->
+    {% if page.tags.size > 0 %}
+      <div class="post-tags">
+        <span class="tags-label">Tags:</span>
+        {% for tag in page.tags %}
+          <!-- 如果你有标签归档页，可以将 href 改为 /tags/#{{ tag | slugify }} -->
+          <span class="tag-pill">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- 4. 上一篇/下一篇 导航 -->
+    <div class="post-navigation">
+      {% if page.previous.url %}
+        <a class="prev" href="{{ page.previous.url | relative_url }}">
+          <small>« Previous</small><br>
+          {{ page.previous.title }}
+        </a>
+      {% else %}
+        <span></span> <!-- 占位符，保持 flex 布局平衡 -->
+      {% endif %}
+
+      {% if page.next.url %}
+        <a class="next" href="{{ page.next.url | relative_url }}">
+          <small>Next »</small><br>
+          {{ page.next.title }}
+        </a>
+      {% endif %}
+    </div>
+
+  </footer>
+
+</article>
+
+<!-- 5. 配套 CSS (建议放入 assets/css/style.css，这里为了方便直接展示) -->
+<style>
+  /* 头部美化 */
+  .post-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+  }
+  .post-title {
+    margin-bottom: 0.5rem;
+  }
+  .post-meta {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  .meta-divider {
+    margin: 0 5px;
+    color: #ccc;
+  }
+
+  /* 正文优化：增加行高，提升阅读舒适度 */
+  .post-content {
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+  
+  /* 标签美化 */
+  .post-tags {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+  }
+  .tags-label {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #555;
+  }
+  .tag-pill {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #333;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+
+  /* 底部导航 */
+  .post-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+  .post-navigation a {
+    max-width: 45%;
+    text-decoration: none;
+    line-height: 1.4;
+  }
+  .post-navigation .next {
+    text-align: right;
+  }
+  .post-navigation small {
+    text-transform: uppercase;
+    color: #999;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+  }
+</style>
