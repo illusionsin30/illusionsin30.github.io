@@ -15,7 +15,7 @@ permalink: /docs/DiT
 DiT 基于 Diffusion probabilistic models 和 Transformer 架构，通过在 DiT Block 中引入 MHA 来实现对多模态信息的高效处理. 想了解 DiT 首先需要对 DDPM 和 Transformer 有一定了解.
 
 ### DDPM
-扩散模型主要基于数理统计与随机过程知识建立。Gaussian diffusion models 假定**前向传播过程** (forward) 是逐步向真实数据引入噪声的过程，其中各个时间步 $t$ 下的数据分布 $\{x_t\}_{t=1}^T$ 满足马尔可夫链的性质：
+扩散模型主要基于数理统计与随机过程知识建立。Gaussian diffusion models 假定**前向传播过程** (forward) 是逐步向真实数据引入噪声的过程，其中各个时间步 $t$ 下的数据分布 $\\{ x_t \\}_{t=1}^T$ 满足马尔可夫链的性质：
 
 $$
     q(x_1, x_2, \cdots, x_T \vert x_0) = \overset{T}{\underset{t=1}{\prod}}q(x_t \vert x_{t-1})
@@ -30,7 +30,7 @@ $$
 也可以写作
 
 $$
-    q(x_t \vert x_{t-1}) = \mathcal(N)(\sqrt{1-\beta_t} x_{t-1}, \beta_t \bm{I})
+    q(x_t \vert x_{t-1}) = \mathcal{N}(\sqrt{1-\beta_t} x_{t-1}, \beta_t \bm{I})
 $$
 
 其中 $\bar{\alpha}_t, \beta_t$ 是相关的**超参数** (hyperparameters)，二者的关系是 $\bar{\alpha}_t = \overset{t}{\underset{s=1}{\prod}} (1-\beta_s)$。基于以上假设，并对数据或者说是样本进行**重整化** (reparameterization) 后，可以将样本写作
@@ -45,15 +45,19 @@ $$
     p_{\theta}(x_{t-1} \vert x_t) = \mathcal{N}(\mu_{\theta}(x_t, t), \sum_\theta(x_t, t))
 $$
 
-其中 $p_\theta$ 就是神经网络需要预测的统计分布。这样操作下，扩散模型实质上就是逼近一个建立在**马尔可夫随机过程** $\{ x_t \}_{t=0}^T$ 上的映射，这个映射可以通过一个行为模式 $x_{n}$ 预测得到前一个行为模式 $x_{n-1}$ 的概率分布。
+其中 $p_\theta$ 就是神经网络需要预测的统计分布。这样操作下，扩散模型实质上就是逼近一个建立在**马尔可夫随机过程** $\\{ x\_t \\}_{t=0}^T$ 上的映射，这个映射可以通过一个行为模式 $x\_{n}$ 预测得到前一个行为模式 $x\_{n-1}$ 的概率分布。
 
-依据统计中最大似然的思想，结合数值分析中寻找极值点的思路，使得 $p_\theta$ 最大的参数 $\theta^* = \underset{\theta}{\max} \mathbb{E}_{q(x_0)}(p_\theta(x_0))$ 可以通过似然函数或是对数似然函数梯度下降来得到。扩散模型采用对数似然函数，其形式为
+依据统计中最大似然的思想，结合数值分析中寻找极值点的思路，使得 $p_\theta$ 最大的参数 
+$
+\theta^* = \underset{\theta}{\max} \mathbb{E}\_{q(x\_0)} (p\_\theta (x_0) )
+$
+可以通过似然函数或是对数似然函数梯度下降来得到。扩散模型采用对数似然函数，其形式为
 
 $$
     \log p_\theta(x_0) = \log \int p_\theta(x_{0:T}) dx_{1:T}
 $$
 
-其中 $p_\theta (x_{0:T})$ 的结构表示 $p_\theta$ 关于 $\{x_i\}_{i=0}^T$ 的联合分布。这积分一般是不可解的，所以需要用到一个称为变分下界 (Evidence low bound, ELBO)的方法进行逼近。引入真实数据分布，并利用 Jensen 不等式有
+其中 $p_\theta (x_{0:T})$ 的结构表示 $p_\theta$ 关于 $\\{x_i\\}_{i=0}^T$ 的联合分布。这积分一般是不可解的，所以需要用到一个称为变分下界 (Evidence low bound, ELBO)的方法进行逼近。引入真实数据分布，并利用 Jensen 不等式有
 
 $$
     \log p_\theta(x_0) = \log \int q(x_{1:T} \vert x_0) \frac{p_\theta(x_{0:T})}{q(x_{1:T} \vert x_0)} dx_{1:T} \geq \mathbb{E}_{q(x_{1:T} \vert x_0)} \left[ \log \frac{p_\theta(x_{0:T})}{q(x_{1:T} \vert x_0)} \right]

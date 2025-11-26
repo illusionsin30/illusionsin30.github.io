@@ -13,80 +13,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-    <!-- 2. 引入 Google Fonts (Montserrat 用于标题，Lato 用于正文) -->
+    <!-- 2. 引入 Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
     
-    <!-- 3. 引入 FontAwesome 图标库 (用于社交图标) -->
+    <!-- 3. 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 4. 你的主样式表 -->
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-
-    <!-- 5. KaTeX 数学公式支持 -->
-<!-- ======================================================= -->
-<!-- KaTeX Official Implementation for Jekyll -->
-<!-- ======================================================= -->
-
-<!-- 1. 引入 CSS 样式表 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-
-<!-- 2. 引入 KaTeX 核心 JS -->
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyFAMyFwwPWvnO1sPp06Y8hJtJ8XcjF544DFF03+Rmw6Tgk+uSjhUEOTtEij7u" crossorigin="anonymous"></script>
-
-<!-- 3. 引入自动渲染插件 (Auto-render extension) -->
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
-
-<!-- 4. 配置并启动渲染 (修正版：兼容 Kramdown) -->
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 第一部分：处理 Kramdown 生成的 Script 标签 ---
-    // Kramdown 把行内公式放在 <script type="math/tex"> 中
-    // 把块级公式放在 <script type="math/tex; mode=display"> 中
-    // 我们需要把它们找出来，手动喂给 KaTeX
-    
-    var mathjaxScripts = document.querySelectorAll('script[type^="math/tex"]');
-    
-    mathjaxScripts.forEach(function(script) {
-      var tex = script.textContent || script.innerText;
-      var displayMode = script.type.indexOf('mode=display') !== -1;
-      
-      // 创建一个用来存放渲染结果的 span
-      var newNode = document.createElement("span");
-      if (displayMode) {
-        newNode.style.display = "block";
-        newNode.style.textAlign = "center";
-      }
-      
-      try {
-        // 直接调用 KaTeX 渲染 API
-        katex.render(tex, newNode, {
-          displayMode: displayMode,
-          throwOnError: false
-        });
-        // 用渲染好的节点替换掉原来的 script 标签
-        script.parentNode.replaceChild(newNode, script);
-      } catch (error) {
-        console.error("KaTeX rendering error:", error);
-      }
-    });
+    <!-- ======================================================= -->
+    <!-- KaTeX 配置 (修正版) -->
+    <!-- ======================================================= -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <!-- 引入 auto-render 插件，这才是渲染页面的关键 -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError : false
+      });">
+    </script>
+    <!-- ======================================================= -->
 
-    // --- 第二部分：启动 Auto-render (兜底) ---
-    // 这部分保留是为了渲染那些你可能直接写在 HTML 文件里的 $...$ 
-    // 或者其他没有被 Kramdown 捕捉到的公式
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "\\[", right: "\\]", display: true},
-        {left: "$", right: "$", display: false},
-        {left: "\\(", right: "\\)", display: false}
-      ],
-      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
-      throwOnError: false
-    });
-  });
-</script>
-    
     {% include head-custom.html %}
   </head>
   
@@ -95,15 +48,12 @@
 
     <div class="wrapper">
       
-      <!-- 侧边栏 / 头部 -->
       <header>
-        <!-- A. 头像区域 -->
         <div class="header-profile">
           <a href="{{ "/" | absolute_url }}" class="site-avatar">
             {% if site.logo %}
               <img src="{{ site.logo | relative_url }}" alt="{{ site.title }}" />
             {% else %}
-              <!-- 如果没有 logo，显示一个默认的图标 -->
               <img src="https://github.com/{{ site.github.owner_name }}.png" alt="{{ site.title }}" />
             {% endif %}
           </a>
@@ -112,24 +62,18 @@
           <p class="site-description">{{ site.description | default: site.github.project_tagline }}</p>
         </div>
 
-        <!-- B. 导航与社交链接 -->
         <nav class="site-nav">
-          <!-- 社交图标组 -->
           <div class="social-links">
             {% if site.github.owner_url %}
               <a href="{{ site.github.owner_url }}" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
             {% endif %}
-            
-            <!-- 你可以在这里手动添加更多链接，例如： -->
             <a href="mailto:gugusine773@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
-            <!-- <a href="https://twitter.com/yourname" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
             
             {% if site.show_downloads %}
               <a href="{{ site.github.zip_url }}" aria-label="Download ZIP"><i class="fas fa-download"></i></a>
             {% endif %}
           </div>
           
-          <!-- 如果是项目页，保留这个 Project 链接 -->
           {% if site.github.is_project_page %}
             <div class="project-links">
               <a href="{{ site.github.repository_url }}" class="btn-outline">View Project <i class="fas fa-code-branch"></i></a>
@@ -138,12 +82,10 @@
         </nav>
       </header>
 
-      <!-- 主内容区 -->
       <main id="main-content">
         {{ content }}
       </main>
 
-      <!-- 页脚 -->
       <footer>
         <p>
           &copy; {{ site.time | date: '%Y' }} {{ site.title }}. 
@@ -154,7 +96,6 @@
     
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
     
-    <!-- 必要的辅助样式 -->
     <style>
       .skip-to-content { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
       .skip-to-content:focus { position: static; width: auto; height: auto; overflow: visible; background: #fff; color: #333; padding: 10px; z-index: 9999; }
