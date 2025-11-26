@@ -12,8 +12,9 @@
   --link-hover-color: #0056b3;
   --border-color: #e5e5e5;
   --code-bg: #f6f8fa;
-  --sidebar-width: 280px;
-  --content-max-width: 860px;
+  --sidebar-width: 260px;
+  --content-max-width: 1200px;
+  --read-width: 750px;
   --font-base: 16px; /* 提升阅读字号 */
 }
 
@@ -43,7 +44,7 @@ body {
   color: var(--text-color);
   font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: var(--font-base);
-  line-height: 1.6;
+  line-height: 1.75;
   margin: 0;
   padding: 0;
   transition: background-color 0.3s, color 0.3s;
@@ -68,6 +69,9 @@ header {
   flex-shrink: 0; /* 防止侧边栏被压缩 */
   position: sticky; /* 现代化的固定方式，比 position: fixed 更好 */
   top: 40px; /* 距离顶部的距离 */
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  scrollbar-width: none; 
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -77,9 +81,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; margin-top: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em;}
-h3 { font-size: 1.25rem; margin-top: 1.5rem; }
+h1 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+h2 { font-size: 1.8rem; margin-top: 3rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+h3 { font-size: 1.4rem; margin-top: 2rem; margin-bottom: 0.8rem; }
 
 a {
   color: var(--link-color);
@@ -263,3 +267,4 @@ footer {
     margin-top: 30px;
   }
 }
+

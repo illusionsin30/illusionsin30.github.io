@@ -170,3 +170,69 @@ footer a {
   color: inherit;
   text-decoration: underline;
 }
+
+/* =========================================
+   文章目录 (Table of Contents) 美化
+   ========================================= */
+
+/* 1. 目录容器 */
+#markdown-toc {
+  background-color: var(--code-bg, #f8f9fa); /* 浅灰背景，适配深色模式变量 */
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 8px;       /* 圆角 */
+  padding: 1.5rem 2rem;     /* 内部留白 */
+  margin: 2rem 0 3rem 0;    /* 上下外边距 */
+  list-style: none;         /* 去掉默认的黑点 */
+  
+  /* 限制宽度，使其不比正文宽，视觉更协调 */
+  max-width: var(--read-width, 750px); 
+  
+  /* 可选：添加一个微弱的阴影 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+/* 2. 目录前的标题伪类 (自动添加 "目录" 二字) */
+#markdown-toc::before {
+  content: "目录 / Contents";
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--heading-color, #333);
+  border-bottom: 2px solid var(--link-color, #267CB9);
+  width: fit-content;
+  padding-bottom: 4px;
+}
+
+/* 3. 第一级列表项 (H1/H2) */
+#markdown-toc > li {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+/* 4. 子列表项 (H3/H4) - 缩进与细体 */
+#markdown-toc ul {
+  list-style: none; /* 去掉子列表黑点 */
+  padding-left: 1.5rem; /* 缩进 */
+  margin-top: 4px;
+}
+
+#markdown-toc ul li {
+  font-weight: 400; /* 字体变细 */
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+/* 5. 链接样式 */
+#markdown-toc a {
+  text-decoration: none;
+  color: var(--text-color, #555);
+  transition: all 0.2s;
+  border-bottom: 1px dashed transparent; /* 默认透明下划线 */
+}
+
+#markdown-toc a:hover {
+  color: var(--link-color, #267CB9);
+  border-bottom-color: var(--link-color); /* 悬停显示虚线 */
+}

@@ -4,6 +4,9 @@ title: DiT
 permalink: /docs/DiT
 ---
 
+* Table of Contents
+{:toc}
+
 # DiT 模型架构与代码学习笔记
 ## DiT 模型架构
 
