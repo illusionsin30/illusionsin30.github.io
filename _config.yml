@@ -23,7 +23,6 @@ plugins:
 # --------------------------
 # Analytics (填入你的 GA4 ID, G-开头)
 # --------------------------
-google_analytics: G-XXXXXXXXXX
 
 # --------------------------
 # Markdown & 排版设置
