@@ -4,101 +4,140 @@
 /* 1. 导入 Jekyll 默认主题 */
 @import "jekyll-theme-minimal";
 
-/* 2. KaTeX 数学公式优化 */
+/* =========================================
+   2. 布局调整 (实现侧边栏固定)
+   ========================================= */
 
-/* 全局 KaTeX 设定 */
-.katex {
-  font-size: 1.05em; /* 数学符号通常比正文小，稍微放大一点点更清晰 */
-  line-height: 1.2;
-}
-
-/* --- 行内公式 (Inline Math, e.g. $E=mc^2$) --- */
-/* 保持背景透明，不打断阅读流 */
-p .katex, 
-li .katex {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  color: inherit; /* 跟随文字颜色 */
-}
-
-/* --- 块级公式 (Display Math, e.g. $$...$$) --- */
-/* 独立成块，增加背景色和滚动条 */
-.katex-display {
-  display: block;
-  margin: 1.5em 0;
-  padding: 1rem;
-  overflow-x: auto;     /* 允许横向滚动 */
-  overflow-y: hidden;
-  text-align: center;
-  border-radius: 6px;
+/* 仅在电脑端 (宽度 > 768px) 启用 */
+@media (min-width: 768px) {
   
-  /* 适配我们之前定义的 CSS 变量，如果没有定义则使用默认值 */
-  background-color: var(--code-bg, #f6f8fa); 
-  border: 1px solid var(--border-color, #e5e5e5);
-}
+  /* 1. 侧边栏固定样式 */
+  header {
+    position: fixed;     /* 固定定位 */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 270px;        /* 宽度 */
+    overflow-y: auto;    /* 允许滚动 */
+    padding: 40px 20px;  /* 增加内部间距 */
+    z-index: 100;
+    background-color: var(--bg-color, #fff); /* 确保背景不透明，防止文字重叠透视 */
+    border-right: 1px solid var(--border-color, #eee); /* 增加一条右侧分割线，视觉更清晰 */
 
-/* 块级公式内部的 wrapper，防止内容被截断 */
-.katex-display > .katex {
-  display: inline-block;
-  white-space: nowrap; /* 强制不换行，触发滚动条 */
-  text-align: initial; /* 重置内部对齐 */
-}
+    /* 美化滚动条 */
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.1); 
+      border-radius: 4px;
+    }
+  }
 
-/* --- 3. 针对不同屏幕和模式的微调 --- */
+  /* 2. 重置 Wrapper 容器 
+     Minimal 主题默认会把 wrapper 居中且定宽，
+     我们需要把它改成全宽，以便我们自己控制布局 */
+  .wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-/* 强制覆盖 KaTeX 可能的换行问题 */
-.katex-html {
-  overflow: hidden;
-}
-
-/* 暗色模式适配 (如果你没有在全局 CSS 定义变量，这里手动兜底) */
-@media (prefers-color-scheme: dark) {
-  .katex-display {
-    background-color: #161b22; /* 深灰背景 */
-    border-color: #30363d;
+  /* 3. 正文区域修正 (关键步骤)
+     给正文添加左边距，数值 = 侧边栏宽度(270px) + 间隙(约50px) */
+  #main-content {
+    margin-left: 320px !important; /* 270 + 50 */
+    max-width: 1200px; /* 限制正文最大宽度，提升阅读体验 */
+    padding: 40px 40px 60px 0; /* 上右下左留白 */
+    width: auto !important;
+    display: block;
   }
   
-  /* 略微降低公式亮度，防止在黑底上太刺眼 */
-  .katex {
-    opacity: 0.95;
+  /* 防止页脚重叠 */
+  footer {
+    margin-left: 10px !important;
+    padding-right: 40px;
+    text-align: left;
   }
 }
 
 /* =========================================
-   Default.html 美化补丁
+   3. KaTeX 数学公式优化
    ========================================= */
 
-/* 1. 字体升级 */
+.katex {
+  font-size: 1.05em;
+  line-height: 1.2;
+}
+
+p .katex, li .katex {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+.katex-display {
+  display: block;
+  margin: 1.5em 0;
+  padding: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+  border-radius: 6px;
+  background-color: var(--code-bg, #f6f8fa); 
+  border: 1px solid var(--border-color, #e5e5e5);
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap;
+  text-align: initial;
+}
+
+.katex-html {
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .katex-display {
+    background-color: #161b22;
+    border-color: #30363d;
+  }
+  .katex { opacity: 0.95; }
+}
+
+/* =========================================
+   4. Default.html 美化补丁
+   ========================================= */
+
 body {
-  font-family: 'Lato', sans-serif; /* 正文使用 Lato */
+  font-family: 'Lato', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif; /* 标题使用 Montserrat */
+  font-family: 'Montserrat', sans-serif;
   letter-spacing: -0.5px;
 }
 
-/* 2. 头像美化 (圆形 + 阴影) */
+/* 头像美化 */
 .site-avatar img {
-  border-radius: 50%; /* 圆形 */
-  width: 120px;       /* 固定大小 */
+  border-radius: 50%;
+  width: 120px;
   height: 120px;
   object-fit: cover;
-  border: 3px solid var(--bg-color, #fff); /* 适配暗色模式的边框 */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 柔和阴影 */
+  border: 3px solid var(--bg-color, #fff);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   margin-bottom: 1rem;
   transition: transform 0.3s ease;
 }
 
 .site-avatar img:hover {
-  transform: scale(1.05) rotate(3deg); /* 鼠标悬停微动特效 */
+  transform: scale(1.05) rotate(3deg);
 }
 
-/* 3. 头部排版 */
-.header-profile {
-  text-align: left; /* 保持左对齐 */
-}
+.header-profile { text-align: left; }
 
 .site-title a {
   color: var(--heading-color, #222);
@@ -112,12 +151,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
 }
 
-/* 4. 社交图标栏 (FontAwesome) */
+/* 社交图标栏 */
 .social-links {
   display: flex;
-  gap: 15px; /* 图标间距 */
+  gap: 15px;
   margin-bottom: 20px;
   font-size: 1.2rem;
+  flex-wrap: wrap; /* 防止溢出 */
 }
 
 .social-links a {
@@ -129,17 +169,17 @@ h1, h2, h3, h4, h5, h6 {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.05); /* 浅灰圆底 */
-  text-decoration: none !important; /* 强制去掉下划线 */
+  background: rgba(0,0,0,0.05);
+  text-decoration: none !important;
 }
 
 .social-links a:hover {
-  background: var(--link-color, #267CB9); /* 悬停变色 */
+  background: var(--link-color, #267CB9);
   color: #fff;
-  transform: translateY(-2px); /* 上浮效果 */
+  transform: translateY(-2px);
 }
 
-/* 5. 按钮样式 (用于 View Project) */
+/* 按钮样式 */
 .btn-outline {
   display: inline-block;
   padding: 8px 16px;
@@ -149,6 +189,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--text-color);
   background: transparent;
+  margin-bottom: 10px;
 }
 
 .btn-outline:hover {
@@ -157,7 +198,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 
-/* 6. 页脚优化 */
+/* 页脚 */
 footer {
   margin-top: 60px;
   padding-top: 20px;
@@ -172,67 +213,81 @@ footer a {
 }
 
 /* =========================================
-   文章目录 (Table of Contents) 美化
+   5. 侧边栏目录样式 (重写)
    ========================================= */
 
-/* 1. 目录容器 */
+/* 侧边栏容器 */
+.sidebar-toc {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0,0,0,0.05); /* 顶部淡淡的分割线 */
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+/* 隐藏正文中的 "目录" 自动生成的标题 (如果脚本还没搬运) */
+/* Jekyll 默认生成的 ID */
 #markdown-toc {
-  background-color: var(--code-bg, #f8f9fa); /* 浅灰背景，适配深色模式变量 */
-  border: 1px solid var(--border-color, #e9ecef);
-  border-radius: 8px;       /* 圆角 */
-  padding: 1.5rem 2rem;     /* 内部留白 */
-  margin: 2rem 0 3rem 0;    /* 上下外边距 */
-  list-style: none;         /* 去掉默认的黑点 */
-  
-  /* 限制宽度，使其不比正文宽，视觉更协调 */
-  max-width: var(--read-width, 750px); 
-  
-  /* 可选：添加一个微弱的阴影 */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  list-style: none; /* 去掉黑点 */
+  padding-left: 0;
+  margin: 0;
+  background: transparent; /* 侧边栏不需要背景色 */
+  border: none;            /* 侧边栏不需要边框 */
+  box-shadow: none;        /* 侧边栏不需要阴影 */
+  max-width: 100%;
 }
 
-/* 2. 目录前的标题伪类 (自动添加 "目录" 二字) */
+/* 去掉之前的伪类标题 content */
 #markdown-toc::before {
-  content: "目录 / Contents";
-  display: block;
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: var(--heading-color, #333);
-  border-bottom: 2px solid var(--link-color, #267CB9);
-  width: fit-content;
-  padding-bottom: 4px;
+  content: none; 
 }
 
-/* 3. 第一级列表项 (H1/H2) */
+/* 第一级列表项 (H1/H2) */
 #markdown-toc > li {
-  font-weight: 600;
   margin-bottom: 8px;
-  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
 }
 
-/* 4. 子列表项 (H3/H4) - 缩进与细体 */
+/* 子列表 (H3/H4) - 缩进 */
 #markdown-toc ul {
-  list-style: none; /* 去掉子列表黑点 */
-  padding-left: 1.5rem; /* 缩进 */
+  list-style: none;
+  padding-left: 15px; /* 缩进 */
   margin-top: 4px;
 }
 
 #markdown-toc ul li {
-  font-weight: 400; /* 字体变细 */
-  font-size: 0.95rem;
+  font-weight: 400; /* 子标题字体变细 */
+  font-size: 0.85rem;
   margin-bottom: 4px;
+  opacity: 0.9;
 }
 
-/* 5. 链接样式 */
+/* 链接样式 */
 #markdown-toc a {
   text-decoration: none;
   color: var(--text-color, #555);
-  transition: all 0.2s;
-  border-bottom: 1px dashed transparent; /* 默认透明下划线 */
+  display: block; /* 增加点击区域 */
+  transition: color 0.2s;
+  border: none;
 }
 
 #markdown-toc a:hover {
   color: var(--link-color, #267CB9);
-  border-bottom-color: var(--link-color); /* 悬停显示虚线 */
+  text-decoration: none;
+  border: none;
+}
+
+/* 手机端隐藏侧边栏目录 (屏幕窄的时候不需要) */
+@media (max-width: 768px) {
+  .sidebar-toc {
+    display: none;
+  }
+  
+  /* 在手机端，如果 JS 还没执行，目录还在正文里，我们希望它显示得正常一点 */
+  #markdown-toc {
+    background: #f8f9fa;
+    padding: 1rem;
+    border: 1px solid #eee;
+  }
 }

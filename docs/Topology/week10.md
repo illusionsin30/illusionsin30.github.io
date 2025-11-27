@@ -1,0 +1,118 @@
+---
+layout: default
+title: TopoWeek10
+permalink: /docs/TopoWeek10
+---
+
+* Table of Contents
+{:toc}
+
+# 第四章 同伦与基本群
+
+## 同伦
+
+### 同伦定义及其性质
+同伦认为是指映射间的连续变形，下面给出同伦的定义：
+> 设 $f, g \in C(X, Y)$，若有连续映射 $H: X \times I \to Y$ 使得 $\forall x \in X, H(x, 0) = f(x), H(x, 1) = g(x)$，则称 $f$ 与 $g$ **同伦**，记作 $f \simeq g: X \to Y$ 或 $f \simeq g$. 称 $H$ 是连接 $f$ 和 $g$ 的一个同伦(伦移)，记作 $H: f \simeq g$ 或 $f \overset{H}{\simeq} g$.
+
+给出一个例子，设 $f, g \in C(X, \mathbb{E}^n)$，容易构造连续映射 $H = (1-t)f(x) + tg(x)$，满足同伦中的条件，因而 $f \simeq g$，$H$ 是连接 $f$ 和 $g$ 的一个伦移.
+
+同伦是 $C(X, Y)$ 中的等价关系，其满足以下几个性质：
+
+- **自反性**：$f \simeq f$，此类同伦称为 **常同伦**.
+- **对称性**：若 $f \simeq g$，则 $g \simeq f$. 
+- **传递性**：若 $f\_1 \simeq f\_2, f\_2 \simeq f\_3$，则 $f\_1 \simeq f\_3$.
+
+以上三条性质很容易证明，第二条性质构造伦移的**逆** $\overline{H}(x, t) = H(x, 1-t)$，第三条性质需要合理构造 $H\_1H\_2: X \times I \to Y$ 并结合粘合引理. 
+
+### 映射类与定端同伦
+
+由于同伦反映 $C(X, Y)$ 中的等价关系，定义 $C(X,Y)$ 在同伦关系下分成的等价类为 **映射类**，所有映射类的集合记作 $[X, Y]$. 常值映射类中的映射 $f$，即 $f$ 同伦于一个常值映射，称为 **零伦的**. 
+
+对于 $\mathbb{E}^n$ 上的凸集 $X$，结合前例知 $\mathrm{id}_X$ 零伦，且同伦于常值映射 $e$. 那么对于任意拓扑空间 $Y$ 和连续映射 $f:X \to Y$，容易得到 $f$ 是零伦的. 联系道路的概念，$I=[0, 1]$ 是凸集，可以给出几个命题：
+- [X, Y] 只有一个映射类.
+- 拓扑空间 $X$ 上每条道路都同伦于点道路. 
+- 道路连通空间中 任何两条道路都同伦.
+
+基于道路空间的特殊同伦关系，我们需要给同伦添加一些附加条件来研究这些特殊的空间.
+
+> 设 $A \subset X, f, g \in C(X, Y)$. 如果存在 $f$ 到 $g$ 的同伦 $H$，使得 $\forall a \in A, H(a, t) = f(a) = g(a), \forall t \in I$. 则称 $f$ 和 $g$ **相对于 $A$ 同伦**，记作 $f \simeq g \text{ rel}A$. 称 $H$ 为 $f$ 到 $g$ 的相对于 $A$ 的同伦，记作 $H: f \simeq g \text{ rel} A$ 或 $f \overset{H}{\simeq} g \text{ rel A}$.
+
+那么对于道路空间，就可以给出**道路的定端同伦**为：$f, g \in C(I, Y)$ 相对于 $\\{0, 1\\}$ 同伦，即 $f \simeq g \text{ rel} \\{0, 1\\}$，记作 $f \underset{\raisebox{0.5ex}{\cdot}{\simeq} g$. 
+
+> **道路的非定端同伦问题**：道路不可以做到非定端同伦，因为此时道路两个端点可以任意移动. 依据之前的研究，在 $\mathbb{E}^2$ 上，假设两个道路 $a, b$ 存在伦移 $H(s, t)$，我们可以给出表示道路角度变化概念的函数：
+> 
+> $$
+> \phi(t) = \theta(t) - \theta(0) = \int_{H(s, t)} \frac{xdy - ydx}{x^2 + y^2} = (2k+1)\pi, k\in \mathbb{Z}
+> $$.
+> 
+> 那么 $H(s, 0) = a(s), H(s, 1) = b(s)$ 可以得到 $\phi(0)=-\pi, \phi(1)=\pi$.
+> 依据积分定义，$\phi(t)$ 是连续的，$\phi: I \to \\{ (2k+1)\pi | k \in \mathbb{Z} \\} \subset \mathbb{E}^1$ 连通，$\phi(I)$ 为常值，这与 $\phi(0) \neq \phi(1)$ 矛盾，因而不存在这个伦移 $H$.
+
+## 基本群
+
+### 道路类运算
+
+前面有定义道路的逆运算，还可以定义道路的乘法：若 $a, b: I \to X, a(1) = b(0)$，则他们的乘积为
+
+$$
+    ab(s) = \begin{cases}
+    a(2s), &0 \leq s \leq \frac{1}{2} \\
+    b(2s - 1), &\frac{1}{2} < s \leq 1
+    \end{cases}
+$$
+
+基于道路及其运算，可以提出道路定端同伦类，让类中的元素可以满足群的一些基本性质. 下面给出道路类的逆运算和乘积运算：
+> **道路类的逆与乘积**：
+> - 若 $a \underset{\cdot}{\simeq} b$，则 $\overline{a} \underset{\cdot}{\simeq} \overline{b}$.
+> - 若 $a \underset{\cdot}{\simeq} b, c \underset{\cdot}{\simeq} d$，且 $ac$ 有意义，则 $ac \underset{\cdot}{\simeq} bd$.
+
+道路类中逆运算结合同伦的对称性较好说明，而乘法运算的说明可以结合同伦的传递性证明方法进行说明. 取 $a \overset{H}{\underset{\cdot}{\simeq}} b, c \overset{G}{\underset{\cdot}{\simeq}} d$，定义 
+
+$$
+F(s, t) = \begin{cases} 
+    H(2s, t) &0\leq s \leq \frac{1}{2} \\
+    G(2s-1, t) &\frac{1}{2} < s \leq 1 
+\end{cases}
+$$
+
+即可依据粘合引理说明 $ab \overset{F}{\underset{\cdot}{\simeq}} cd$. 
+
+已知道路乘法不满足结合律，那么抛出一个
+*Qusetion: 道路类的乘法运算是否满足结合律？* 道路类的乘法运算**满足结合律**，即
+
+$$
+    (ab)c \underset{\cdot}{\simeq} a(bc) = \begin{cases}
+        a(2s), &0\leq s \leq \frac{1}{2} \\ 
+        bc(2s), &\frac{1}{2} < s \leq 1 = \begin{cases}
+            b(4s - 2), &\frac{1}{2} \leq s \leq \frac{3}{4} \\
+            c(4s - 3), &\frac{1}{2} < s \leq 1 
+        \end{cases}
+    \end{cases}
+$$
+
+这实质上只是在乘法运算的$t-s$平面上多切割出一块区域，那么伦移相应地也多划分出一块即可，依据道路首尾对应关系，可以写出将变化时间点 $s$ 从 $\\{ \frac{1}{4}, \frac{1}{2} \\}$ 变换到 $\\{ \frac{1}{2}, \frac{3}{4} \\} $ 的伦移
+
+$$
+    H(s, t) = \begin{cases}
+        a\left( \frac{4s}{t+1} \right), & 0 \leq s \leq \frac{t+1}{4} \\
+        b\left( 4s-t-1 \right), & \frac{t+1}{4} \leq s \leq \frac{t+2}{4} \\
+        c\left( \frac{4s-t-2}{2-t} \right), & \frac{t+2}{4} \leq s \leq 1 \\
+    \end{cases}
+$$
+
+满足 $H(0, t) = a(0), H(1, t) = c(1)$，于是便证明了他们定端同伦. 这是一种野蛮且朴素地找对应的结果，尤承业先生撰写的讲义中通过构造 $I \times I \to [0, 3] \to X$ 使得形式更为简洁，可以参见《基础拓扑学讲义》P111.
+
+### 基本群的概念
+
+群还存在一个重要的概念：单位元 $e$，满足 $ex = x = xe$. 给出包含有特定基点的道路群的命题：
+
+> 取定 $X$ 中一点$x\_0$，记 $X$ 中以 $x\_0$ 为基点的所有闭路类集合为 $\pi\_1(X, x\_0)$，对于 $\pi\_1(X, x\_0)$ 中的成员 $a$ 及点道路(常值映射) $e\_{x\_0}$，
+> 
+> $$
+> e\_{x\_0} a \overset{H}{\underset{\cdot}{\simeq}} a \overset{H}{\underset{\cdot}{\simeq}} ae\_{x\_0}
+> $$
+ 
+其中 $\pi\_1(X, x_0)$ 即为在道路类乘法运算下 $X$ 以 $x\_0$ 为基点的基本群.
+
+[back 返回](/)

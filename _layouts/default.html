@@ -23,11 +23,10 @@
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     
     <!-- ======================================================= -->
-    <!-- KaTeX 配置 (修正版) -->
+    <!-- KaTeX 配置 -->
     <!-- ======================================================= -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <!-- 引入 auto-render 插件，这才是渲染页面的关键 -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
           delimiters: [
               {left: '$$', right: '$$', display: true},
@@ -38,9 +37,9 @@
           throwOnError : false
       });">
     </script>
-    <!-- ======================================================= -->
 
     {% include head-custom.html %}
+    
   </head>
   
   <body>
@@ -80,6 +79,10 @@
             </div>
           {% endif %}
         </nav>
+
+        <!-- 侧边栏目录容器 -->
+        <div id="sidebar-toc" class="sidebar-toc"></div>
+
       </header>
 
       <main id="main-content">
@@ -96,9 +99,29 @@
     
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
     
-    <style>
-      .skip-to-content { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
-      .skip-to-content:focus { position: static; width: auto; height: auto; overflow: visible; background: #fff; color: #333; padding: 10px; z-index: 9999; }
-    </style>
+    <!-- 【新增】目录搬运脚本 -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // 1. 找到 Jekyll 在正文中生成的目录
+        var originalToc = document.getElementById("markdown-toc");
+        // 2. 找到侧边栏容器
+        var sidebarContainer = document.getElementById("sidebar-toc");
+        
+        // 3. 如果两者都存在，则移动
+        if (originalToc && sidebarContainer) {
+          // 创建一个标题
+          var tocTitle = document.createElement("h3");
+          tocTitle.innerText = "目录 / Contents";
+          tocTitle.style.fontSize = "1rem";
+          tocTitle.style.marginTop = "0";
+          tocTitle.style.marginBottom = "10px";
+          tocTitle.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
+          
+          // 将正文目录移动到侧边栏
+          sidebarContainer.appendChild(tocTitle);
+          sidebarContainer.appendChild(originalToc);
+        }
+      });
+    </script>
   </body>
 </html>
