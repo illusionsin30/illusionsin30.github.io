@@ -19,9 +19,9 @@ layout: default
 - [Transformer架构解读](/docs/transformer)
 - [GPT与BERT架构](/docs/GPTandBert)
 
-## 前沿模型科研实践
+## 前沿论文阅读笔记
 
-- [DiT模型代码学习笔记](/docs/DiT).
+- [MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/docs/MPQ-DM)
 
 目前很多笔记仍在进行中，主播努力学习ing...
 
