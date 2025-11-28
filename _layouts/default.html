@@ -98,30 +98,30 @@
     </div>
     
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-    
-    <!-- 【新增】目录搬运脚本 -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        // 1. 找到 Jekyll 在正文中生成的目录
-        var originalToc = document.getElementById("markdown-toc");
-        // 2. 找到侧边栏容器
-        var sidebarContainer = document.getElementById("sidebar-toc");
+  <!-- 【修改版】目录搬运脚本 -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. 找到 Jekyll 在正文中生成的目录
+      var originalToc = document.getElementById("markdown-toc");
+      // 2. 找到侧边栏容器
+      var sidebarContainer = document.getElementById("sidebar-toc");
+      
+      // 3. 只有在电脑端 (宽度 > 768px) 且两个元素都存在时，才进行搬运
+      if (originalToc && sidebarContainer && window.innerWidth > 768) {
         
-        // 3. 如果两者都存在，则移动
-        if (originalToc && sidebarContainer) {
-          // 创建一个标题
-          var tocTitle = document.createElement("h3");
-          tocTitle.innerText = "目录 / Contents";
-          tocTitle.style.fontSize = "1rem";
-          tocTitle.style.marginTop = "0";
-          tocTitle.style.marginBottom = "10px";
-          tocTitle.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
-          
-          // 将正文目录移动到侧边栏
-          sidebarContainer.appendChild(tocTitle);
-          sidebarContainer.appendChild(originalToc);
-        }
-      });
-    </script>
+        // 创建一个标题
+        var tocTitle = document.createElement("h3");
+        tocTitle.innerText = "目录 / Contents";
+        tocTitle.style.fontSize = "1rem";
+        tocTitle.style.marginTop = "0";
+        tocTitle.style.marginBottom = "10px";
+        tocTitle.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
+        
+        // 将正文目录移动到侧边栏
+        sidebarContainer.appendChild(tocTitle);
+        sidebarContainer.appendChild(originalToc);
+      }
+    });
+  </script>
   </body>
 </html>

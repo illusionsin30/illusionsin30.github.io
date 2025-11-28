@@ -21,7 +21,8 @@ layout: default
 
 ## 前沿论文阅读笔记
 
-- [MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/docs/MPQ-DM)
+### 模型架构优化
+- [\[AAAI 2025\]MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/docs/MPQ-DM)
 
 目前很多笔记仍在进行中，主播努力学习ing...
 

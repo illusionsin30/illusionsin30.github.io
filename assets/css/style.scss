@@ -211,83 +211,125 @@ footer a {
   color: inherit;
   text-decoration: underline;
 }
-
 /* =========================================
-   5. 侧边栏目录样式 (重写)
+   5. 侧边栏目录样式 (重写 - 手机/电脑分流)
    ========================================= */
 
-/* 侧边栏容器 */
-.sidebar-toc {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(0,0,0,0.05); /* 顶部淡淡的分割线 */
-  font-size: 0.9rem;
-  text-align: left;
-}
-
-/* 隐藏正文中的 "目录" 自动生成的标题 (如果脚本还没搬运) */
-/* Jekyll 默认生成的 ID */
+/* --- 1. 手机端 (默认样式) --- */
+/* 在手机上，目录应该是一个显眼的方框，保留列表样式 */
 #markdown-toc {
-  list-style: none; /* 去掉黑点 */
-  padding-left: 0;
-  margin: 0;
-  background: transparent; /* 侧边栏不需要背景色 */
-  border: none;            /* 侧边栏不需要边框 */
-  box-shadow: none;        /* 侧边栏不需要阴影 */
-  max-width: 100%;
+  background: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 1rem 1rem 1rem 2rem; /* 左侧留出空间给黑点 */
+  margin-bottom: 2rem;
+  list-style: disc; /* 恢复黑点 */
 }
 
-/* 去掉之前的伪类标题 content */
-#markdown-toc::before {
-  content: none; 
+#markdown-toc li {
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-/* 第一级列表项 (H1/H2) */
-#markdown-toc > li {
-  margin-bottom: 8px;
-  line-height: 1.4;
-  font-weight: 600;
-}
-
-/* 子列表 (H3/H4) - 缩进 */
 #markdown-toc ul {
-  list-style: none;
-  padding-left: 15px; /* 缩进 */
-  margin-top: 4px;
+  padding-left: 20px; /* 二级目录缩进 */
+  list-style: circle; /* 二级目录空心圆点 */
 }
 
-#markdown-toc ul li {
-  font-weight: 400; /* 子标题字体变细 */
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  opacity: 0.9;
+/* 去掉 Jekyll 自动生成的 "目录" 伪类文字 */
+#markdown-toc::before {
+  content: none;
 }
 
-/* 链接样式 */
-#markdown-toc a {
-  text-decoration: none;
-  color: var(--text-color, #555);
-  display: block; /* 增加点击区域 */
-  transition: color 0.2s;
-  border: none;
+/* --- 2. 电脑端 (侧边栏样式) --- */
+@media (min-width: 768px) {
+  
+  /* 侧边栏容器 */
+  .sidebar-toc {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    font-size: 0.9rem;
+    text-align: left;
+    display: block; /* 确保显示 */
+  }
+
+  /* 这里的样式只在目录被 JS 搬运到侧边栏后生效 */
+  .sidebar-toc #markdown-toc {
+    background: transparent; /* 去掉背景色 */
+    border: none;            /* 去掉边框 */
+    padding: 0;              /* 去掉内边距 */
+    margin: 0;
+    list-style: none;        /* 去掉黑点 */
+    box-shadow: none;
+  }
+
+  /* 第一级列表项 (H1/H2) */
+  .sidebar-toc #markdown-toc > li {
+    margin-bottom: 8px;
+    font-weight: 600;
+    list-style: none; /* 确保无黑点 */
+  }
+
+  /* 子列表 (H3/H4) */
+  .sidebar-toc #markdown-toc ul {
+    padding-left: 15px;
+    margin-top: 4px;
+    list-style: none; /* 确保无黑点 */
+  }
+
+  .sidebar-toc #markdown-toc ul li {
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
+  /* 链接交互 */
+  .sidebar-toc #markdown-toc a {
+    text-decoration: none;
+    color: var(--text-color, #555);
+    display: block;
+    transition: color 0.2s;
+  }
+
+  .sidebar-toc #markdown-toc a:hover {
+    color: var(--link-color, #267CB9);
+  }
 }
 
-#markdown-toc a:hover {
-  color: var(--link-color, #267CB9);
-  text-decoration: none;
-  border: none;
-}
-
-/* 手机端隐藏侧边栏目录 (屏幕窄的时候不需要) */
+/* --- 3. 手机端隐藏侧边栏容器 --- */
 @media (max-width: 768px) {
   .sidebar-toc {
-    display: none;
+    display: none !important;
   }
-  
-  /* 在手机端，如果 JS 还没执行，目录还在正文里，我们希望它显示得正常一点 */
-  #markdown-toc {
-    background: #f8f9fa;
-    padding: 1rem;
-    border: 1px solid #eee;
-  }
+}
+
+/* =========================================
+   6. Skip to Content (无障碍链接样式修正)
+   ========================================= */
+
+.skip-to-content {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+/* 当使用键盘 Tab 选中时显示 (可选，为了更好的无障碍体验) */
+.skip-to-content:focus {
+  top: 10px;
+  left: 10px;
+  width: auto;
+  height: auto;
+  background-color: #267CB9;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
