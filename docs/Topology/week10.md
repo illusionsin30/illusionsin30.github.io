@@ -1,11 +1,9 @@
 ---
-layout: default
+layout: post
 title: TopoWeek10
 permalink: /docs/TopoWeek10
+toc: true
 ---
-
-* Table of Contents
-{:toc}
 
 # 第四章 同伦与基本群
 
@@ -30,7 +28,7 @@ permalink: /docs/TopoWeek10
 由于同伦反映 $C(X, Y)$ 中的等价关系，定义 $C(X,Y)$ 在同伦关系下分成的等价类为 **映射类**，所有映射类的集合记作 $[X, Y]$. 常值映射类中的映射 $f$，即 $f$ 同伦于一个常值映射，称为 **零伦的**. 
 
 对于 $\mathbb{E}^n$ 上的凸集 $X$，结合前例知 $\mathrm{id}_X$ 零伦，且同伦于常值映射 $e$. 那么对于任意拓扑空间 $Y$ 和连续映射 $f:X \to Y$，容易得到 $f$ 是零伦的. 联系道路的概念，$I=[0, 1]$ 是凸集，可以给出几个命题：
-- [X, Y] 只有一个映射类.
+- $[X, Y]$ 只有一个映射类.
 - 拓扑空间 $X$ 上每条道路都同伦于点道路. 
 - 道路连通空间中 任何两条道路都同伦.
 
@@ -38,7 +36,7 @@ permalink: /docs/TopoWeek10
 
 > 设 $A \subset X, f, g \in C(X, Y)$. 如果存在 $f$ 到 $g$ 的同伦 $H$，使得 $\forall a \in A, H(a, t) = f(a) = g(a), \forall t \in I$. 则称 $f$ 和 $g$ **相对于 $A$ 同伦**，记作 $f \simeq g \text{ rel}A$. 称 $H$ 为 $f$ 到 $g$ 的相对于 $A$ 的同伦，记作 $H: f \simeq g \text{ rel} A$ 或 $f \overset{H}{\simeq} g \text{ rel A}$.
 
-那么对于道路空间，就可以给出**道路的定端同伦**为：$f, g \in C(I, Y)$ 相对于 $\\{0, 1\\}$ 同伦，即 $f \simeq g \text{ rel} \\{0, 1\\}$，记作 $f \underset{\raisebox{0.5ex}{\cdot}{\simeq} g$. 
+那么对于道路空间，就可以给出**道路的定端同伦**为：$f, g \in C(I, Y)$ 相对于 $\\{0, 1\\}$ 同伦，即 $f \simeq g \text{ rel} \\{0, 1\\}$，记作 $f \underset{\cdot}{\simeq} g$. 
 
 > **道路的非定端同伦问题**：道路不可以做到非定端同伦，因为此时道路两个端点可以任意移动. 依据之前的研究，在 $\mathbb{E}^2$ 上，假设两个道路 $a, b$ 存在伦移 $H(s, t)$，我们可以给出表示道路角度变化概念的函数：
 > 
@@ -110,7 +108,7 @@ $$
 > 取定 $X$ 中一点$x\_0$，记 $X$ 中以 $x\_0$ 为基点的所有闭路类集合为 $\pi\_1(X, x\_0)$，对于 $\pi\_1(X, x\_0)$ 中的成员 $a$ 及点道路(常值映射) $e\_{x\_0}$，
 > 
 > $$
-> e\_{x\_0} a \overset{H}{\underset{\cdot}{\simeq}} a \overset{H}{\underset{\cdot}{\simeq}} ae\_{x\_0}
+> e_{x_0} a \overset{H}{\underset{\cdot}{\simeq}} a \overset{H}{\underset{\cdot}{\simeq}} ae_{x_0}
 > $$
  
 其中 $\pi\_1(X, x_0)$ 即为在道路类乘法运算下 $X$ 以 $x\_0$ 为基点的基本群.

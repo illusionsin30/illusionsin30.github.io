@@ -1,63 +1,72 @@
 @import "fonts";
-@import "rouge-github";
+/* @import "rouge-github";  <-- 建议移除这行，我们将在下面手动定义更完美的 GitHub 样式 */
 
 /* =========================================
-   1. CSS 变量 (方便一键改配色)
+   1. CSS 变量 (GitHub 配色方案)
    ========================================= */
 :root {
+  /* 基础布局颜色 */
   --bg-color: #ffffff;
-  --text-color: #333333;
-  --heading-color: #111111;
-  --link-color: #267CB9;
-  --link-hover-color: #0056b3;
-  --border-color: #e5e5e5;
-  --code-bg: #f6f8fa;
+  --text-color: #24292f;      /* GitHub 黑色文字 */
+  --heading-color: #1f2328;
+  --link-color: #0969da;      /* GitHub 链接蓝 */
+  --link-hover-color: #1853db;
+  --border-color: #d0d7de;
+  
+  /* 代码块变量 - Light Mode */
+  --code-bg: #f6f8fa;         /* 代码块背景 */
+  --code-text: #24292f;       /* 代码基础颜色 */
+  --code-inline-bg: rgba(175, 184, 193, 0.2); /* 行内代码背景 */
+  
+  /* 布局尺寸 */
   --sidebar-width: 260px;
   --content-max-width: 1200px;
-  --read-width: 750px;
-  --font-base: 16px; /* 提升阅读字号 */
+  --font-base: 16px;
 }
 
-/* 深色模式 (Dark Mode) 自动适配 */
+/* 深色模式 (Dark Mode) - GitHub Dark Dimmed */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #1a1a1a;
-    --text-color: #c9d1d9;
-    --heading-color: #f0f6fc;
-    --link-color: #58a6ff;
+    --bg-color: #0d1117;      /* GitHub Dark 背景 */
+    --text-color: #c9d1d9;    /* GitHub Dark 文字 */
+    --heading-color: #e6edf3;
+    --link-color: #58a6ff;    /* GitHub Dark 链接 */
     --link-hover-color: #79c0ff;
     --border-color: #30363d;
+    
+    /* 代码块变量 - Dark Mode */
     --code-bg: #161b22;
+    --code-text: #c9d1d9;
+    --code-inline-bg: rgba(110, 118, 129, 0.4);
   }
-  img { opacity: 0.85; } /* 降低图片亮度防止刺眼 */
+  img { opacity: 0.85; }
 }
 
 /* =========================================
    2. 全局重置与基础排版
    ========================================= */
 * {
-  box-sizing: border-box; /* 极其重要，防止 padding 撑破布局 */
+  box-sizing: border-box;
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-size: var(--font-base);
-  line-height: 1.75;
+  line-height: 1.6; /* GitHub 默认行高 */
   margin: 0;
   padding: 0;
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* 布局容器：使用 Flexbox 替代 Float */
 .wrapper {
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 40px 20px;
   display: flex;
-  flex-direction: row; /* 默认横向排列 */
-  gap: 60px; /* 侧边栏和内容的间距 */
+  flex-direction: row;
+  gap: 60px;
   align-items: flex-start;
 }
 
@@ -66,9 +75,9 @@ body {
    ========================================= */
 header {
   width: var(--sidebar-width);
-  flex-shrink: 0; /* 防止侧边栏被压缩 */
-  position: sticky; /* 现代化的固定方式，比 position: fixed 更好 */
-  top: 40px; /* 距离顶部的距离 */
+  flex-shrink: 0;
+  position: sticky;
+  top: 40px;
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   scrollbar-width: none; 
@@ -76,195 +85,198 @@ header {
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--heading-color);
-  margin: 0 0 15px;
+  margin-top: 24px;
+  margin-bottom: 16px;
   line-height: 1.25;
   font-weight: 600;
 }
 
-h1 { font-size: 2.5rem; margin-bottom: 1.5rem; }
-h2 { font-size: 1.8rem; margin-top: 3rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-h3 { font-size: 1.4rem; margin-top: 2rem; margin-bottom: 0.8rem; }
+h1 { font-size: 2em; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
 
 a {
   color: var(--link-color);
   text-decoration: none;
-  transition: color 0.2s;
 }
-
-a:hover, a:focus {
-  color: var(--link-hover-color);
-  text-decoration: underline; /* 增加下划线提升可访问性 */
+a:hover {
+  text-decoration: underline;
 }
 
 /* =========================================
    4. 主内容区 (Section)
    ========================================= */
 section {
-  flex-grow: 1; /* 占据剩余空间 */
-  min-width: 0; /* 防止 flex 子项溢出 */
+  flex-grow: 1;
+  min-width: 0;
 }
 
 p, ul, ol, table, pre, dl, blockquote {
-  margin: 0 0 1.5rem;
+  margin-bottom: 16px;
 }
 
-/* 引用块美化 */
 blockquote {
-  border-left: 4px solid var(--link-color); /* 加粗边框 */
+  border-left: 0.25em solid var(--border-color);
   color: var(--text-color);
   opacity: 0.8;
-  margin: 0;
-  padding-left: 1rem;
-  font-style: italic;
+  padding: 0 1em;
+  margin: 0 0 16px 0;
   background: transparent;
 }
 
-/* 代码块美化 */
-code, pre {
+/* =========================================
+   5. 代码块美化 (核心修改区域)
+   ========================================= */
+code, pre, .highlight {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-  font-size: 0.9em;
+  font-size: 0.85em; /* 13.6px based on 16px base */
 }
 
+/* 行内代码 (`code` not inside `pre`) */
 code {
-  background-color: var(--border-color); /* 行内代码背景 */
   padding: 0.2em 0.4em;
-  border-radius: 3px;
+  margin: 0;
+  font-size: 85%;
+  background-color: var(--code-inline-bg);
+  border-radius: 6px;
 }
 
+/* 代码块容器 */
 pre {
-  background: var(--code-bg);
-  padding: 1rem;
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
-  overflow-x: auto;
+  border: 1px solid var(--border-color); /* 可选：深色模式下边框可能不明显 */
 }
+
+/* 代码块内部的 code */
 pre code {
-  background: none;
+  background-color: transparent;
   padding: 0;
-  border: none;
+  border: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
   color: inherit;
 }
 
-/* 表格美化 */
+/* =========================================
+   6. 表格 & 图片
+   ========================================= */
 table {
-  width: 100%;
+  border-spacing: 0;
   border-collapse: collapse;
-  margin-bottom: 1.5rem;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
-th, td {
-  padding: 10px;
+td, th {
+  padding: 6px 13px;
   border: 1px solid var(--border-color);
 }
 
 th {
-  background-color: var(--code-bg);
   font-weight: 600;
+  background-color: var(--code-bg); /* 表头浅灰背景 */
 }
 
-tr:nth-child(even) {
-  background-color: rgba(0,0,0,0.02); /* 斑马纹 */
+tr:nth-child(2n) {
+  background-color: var(--code-bg); /* 斑马纹 */
 }
 
-/* 图片自适应 */
 img {
   max-width: 100%;
-  height: auto;
-  border-radius: 4px;
+  box-sizing: content-box;
+  background-color: var(--bg-color);
 }
 
 hr {
-  height: 1px;
-  border: 0;
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
   background-color: var(--border-color);
-  margin: 2rem 0;
+  border: 0;
 }
 
 /* =========================================
-   5. 下载按钮组 (Modernized)
+   7. 响应式与杂项
    ========================================= */
 ul.downloads {
   list-style: none;
   padding: 0;
   margin: 20px 0;
-  display: flex; /* 使用 flex 让按钮自适应 */
+  display: flex;
   width: 100%;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   overflow: hidden;
 }
-
-.downloads li {
-  flex: 1; /* 平分宽度 */
-  border-right: 1px solid var(--border-color);
-}
-
-.downloads li:last-child {
-  border-right: none;
-}
-
+.downloads li { flex: 1; border-right: 1px solid var(--border-color); }
+.downloads li:last-child { border-right: none; }
 .downloads a {
   display: block;
   padding: 10px 0;
   text-align: center;
   background: var(--code-bg);
   color: var(--text-color);
-  font-size: 0.85rem;
   font-weight: 600;
 }
+.downloads a:hover { background: var(--border-color); text-decoration: none; }
 
-.downloads a:hover {
-  background: var(--border-color);
-  text-decoration: none;
-}
+footer { margin-top: 50px; opacity: 0.7; font-size: 0.85rem; }
 
-.downloads small {
-  display: block;
-  font-weight: normal;
-  opacity: 0.7;
-  font-size: 0.75rem;
-}
-
-/* =========================================
-   6. 页脚
-   ========================================= */
-footer {
-  margin-top: 50px;
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
-
-/* =========================================
-   7. 响应式设计 (Mobile)
-   ========================================= */
 @media screen and (max-width: 768px) {
-  .wrapper {
-    flex-direction: column; /* 上下堆叠 */
-    gap: 30px;
-    padding: 20px;
-  }
-
-  header {
-    width: 100%;
-    position: static; /* 移动端取消固定定位 */
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
-  }
-  
-  header h1 {
-    font-size: 1.75rem;
-  }
-
-  ul.downloads {
-    margin-top: 20px;
-  }
-
-  footer {
-    position: static;
-    width: 100%;
-    text-align: center;
-    margin-top: 30px;
-  }
+  .wrapper { flex-direction: column; gap: 30px; padding: 20px; }
+  header { width: 100%; position: static; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+  header h1 { font-size: 1.75rem; }
+  footer { position: static; text-align: center; }
 }
 
+/* =========================================================
+   8. SYNTAX HIGHLIGHTING (GitHub Light & Dark)
+   Jekyll (Rouge) 自动生成的 CSS 类名配色
+   ========================================================= */
+
+/* --- 默认 (Light Mode) --- */
+/* 关键字 (def, if, return) -> 红色 */
+.highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #cf222e; }
+/* 字符串 ("string") -> 蓝色 */
+.highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss { color: #0a3069; }
+/* 注释 (# comment) -> 灰色 */
+.highlight .c, .highlight .ch, .highlight .cm, .highlight .c1, .highlight .cs, .highlight .cp, .highlight .cpf { color: #6e7781; }
+/* 函数/方法 (function) -> 紫色 */
+.highlight .nf, .highlight .fm { color: #8250df; }
+/* 变量/属性 -> 黑色/深灰 */
+.highlight .n, .highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi { color: #24292f; }
+/* 常量/类名 -> 橙色/深蓝 */
+.highlight .nc, .highlight .no { color: #953800; }
+/* 数字 -> 蓝色 */
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo { color: #0550ae; }
+/* 运算符 -> 黑色 */
+.highlight .o, .highlight .ow { color: #24292f; }
+
+
+/* --- 深色模式 (Dark Mode) --- */
+@media (prefers-color-scheme: dark) {
+  /* 关键字 -> 浅红/粉色 */
+  .highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #ff7b72; }
+  /* 字符串 -> 浅蓝 */
+  .highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss { color: #a5d6ff; }
+  /* 注释 -> 灰色 */
+  .highlight .c, .highlight .ch, .highlight .cm, .highlight .c1, .highlight .cs, .highlight .cp, .highlight .cpf { color: #8b949e; }
+  /* 函数/方法 -> 紫色 */
+  .highlight .nf, .highlight .fm { color: #d2a8ff; }
+  /* 变量/属性 -> 白色/浅灰 */
+  .highlight .n, .highlight .na, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi { color: #c9d1d9; }
+  /* 常量/类名 -> 橙色/加粗 */
+  .highlight .nc, .highlight .no { color: #ffa657; }
+  /* 数字 -> 蓝色 */
+  .highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo { color: #79c0ff; }
+  /* 运算符 -> 白色 */
+  .highlight .o, .highlight .ow { color: #c9d1d9; }
+}
