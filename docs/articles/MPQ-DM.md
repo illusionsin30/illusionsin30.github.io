@@ -23,7 +23,7 @@ $$
     \bm{x}_q = \mathrm{clip}\left( \lfloor \frac{\bm{x}_f}{s} \rceil + z, 0, 2^N - 1 \right)
 $$
 
-$\bm{x}_f$ 为量化前的浮点数张量，在代码实现中类型一般为 `torch.float32`.  $\lfloor \cdot \rceil$ 表示四舍五入取整，$s = \frac{x\_{\max} - x\_{\min}}{2^N-1}$ 为量化缩放比例 (scale)，$z = - \lfloor \frac{l}{s} \rceil$ 为偏置项. $N$ 为量化 bit 数，$\mathrm{clip}$ 表示截断操作，将超出范围的数值截断在 $[0, 2^N -1]$ 中. 
+$\bm{x}_f$ 为量化前的浮点数张量，在代码实现中类型一般为 `torch.float32`.  $\lfloor \cdot \rceil$ 表示四舍五入取整，$s = \frac{x\_{\max} - x\_{\min}}{2^N-1}$ 为量化缩放比例 (scale)，$z = - \lfloor \frac{x\_{\min}}{s} \rceil$ 为偏置项调整缩放零点. $N$ 为量化 bit 数，$\mathrm{clip}$ 表示截断操作，将超出范围的数值截断在 $[0, 2^N -1]$ 中. 
 
 **量化操作将数据近似线性地从 $[\mathrm{min\_{float}}, \mathrm{max\_{float}}]$ 映射到量化后的范围 $[0, 2^N - 1]$**. 可以预测到当两个数据误差在一定范围内时，由于四舍五入的精度问题，这个映射会将二者映射到同一值. 
 
