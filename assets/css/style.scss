@@ -63,7 +63,7 @@
 }
 
 /* =========================================
-   3. KaTeX 数学公式优化
+   3. KaTeX 数学公式优化 (修正版)
    ========================================= */
 
 .katex {
@@ -71,13 +71,15 @@
   line-height: 1.2;
 }
 
+/* 确保行内公式 ($...$) 和块级公式的颜色都能跟随主题变化 */
 p .katex, li .katex {
+  color: var(--text-color); /* 强制继承父级文本颜色 */
   background-color: transparent;
   padding: 0;
   border-radius: 0;
-  color: inherit;
 }
 
+/* 块级公式 ($$ ... $$) 的背景和边框 */
 .katex-display {
   display: block;
   margin: 1.5em 0;
@@ -86,6 +88,7 @@ p .katex, li .katex {
   overflow-y: hidden;
   text-align: center;
   border-radius: 6px;
+  /* 完全依赖主题变量，无需为深色模式写额外代码 */
   background-color: var(--code-bg, #f6f8fa); 
   border: 1px solid var(--border-color, #e5e5e5);
 }
@@ -98,14 +101,6 @@ p .katex, li .katex {
 
 .katex-html {
   overflow: hidden;
-}
-
-@media (prefers-color-scheme: dark) {
-  .katex-display {
-    background-color: #161b22;
-    border-color: #30363d;
-  }
-  .katex { opacity: 0.95; }
 }
 
 /* =========================================
@@ -332,4 +327,47 @@ footer a {
   text-decoration: none;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* 项目间距 */
+    align-items: flex-start; /* 顶部对齐，防止下拉时撑开其他元素 */
+}
+
+/* 目录容器样式 */
+.meta-toc {
+    position: relative;
+    cursor: pointer;
+}
+
+.meta-toc summary {
+    list-style: none; /* 隐藏默认三角 */
+    outline: none;
+}
+.meta-toc summary::-webkit-details-marker {
+    display: none;
+}
+
+/* 悬浮或展开后的目录框 */
+.toc-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.9em;
+}
+
+.toc-content ul {
+    padding-left: 20px;
+    margin: 0;
 }

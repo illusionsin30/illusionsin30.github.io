@@ -1,21 +1,20 @@
 ---
-layout: default
-title: MPQ-DM
+layout: post
+title: "MPQ-DM 论文学习"
+date: 2025-11-28
 permalink: /docs/MPQ-DM
+toc: true
 ---
-
-* Table of Contents
-{:toc}
 
 ![MPQ-DM](../images/MPQ-DM.png)
 
-# 问题背景
+## 问题背景
 
 对大模型的量化 (quantization) 主流为两种策略，**训练后量化** (Post-training quantization, PTQ) 和**量化感知训练** (Quantization-aware training, QAT). PTQ 不需要额外的训练，只需要在预训练模型上直接量化或利用 calibration data 做特定粒度的量化操作. QAT 则是 fine-tune 量化处理后的预训练模型，训练开销较大. 
 
 在极低量化精度 (bit-width) 下，PTQ-based 的模型表现效果会严重下降，而 QAT-based 的模型表现下降较低. 考虑到训练成本较大，QAT 虽然效果较好但是训练压力太大，因而优化 PTQ-based 的方法在极低精度下的表现成为量化的一个热门研究方向.
 
-## 理论分析
+### 理论分析
 
 对 diffusion models 进行及其低 bit 量化时 (2-4 bit)，涉及到对 activation 和 weight 张量值的**离散化**，如下所示
 
@@ -28,10 +27,10 @@ $\bm{x}_f$ 为量化前的浮点数张量，在代码实现中类型一般为 `t
 **量化操作将数据近似线性地从 $[\mathrm{min\_{float}}, \mathrm{max\_{float}}]$ 映射到量化后的范围 $[0, 2^N - 1]$**. 在数据参与计算时，则需要逆向变换得到与原始 $\bm{x}\_f$ 相近的张量，即反量化过程：
 
 $$
-    \hat{\bm{x}\_f} = (\bm{x}\_q - z)s
+    \hat{\bm{x}}_f = (\bm{x}_q - z)s
 $$
 
-可以预测到当两个数据误差在一定范围内时，由于四舍五入的精度问题，这个映射会将二者映射到同一值. 
+可以预测到当 $\bm{x}_f$ 中两个值误差在一定范围内时，由于四舍五入的精度问题，这个映射会将二者映射到同一值. 
 
 ```python
 import torch
@@ -59,7 +58,7 @@ print(f'x_q1: {x_q1}\nx_q2: {x_q2}')
 
 低 bit 下离散化的精度极其低，基于 channels 的量化如果部分 channels 中存在**异常值 outlier**，那么这些 channels 的量化效果就会大打折扣，进而导致模型表现性能下降. 同时，离散化的特征也不便于 diffusion model 在不同时间步下稳定学习图像特征.
 
-## 相关工作
+### 相关工作
 
 针对量化过程出现的 outliers，一个可行的方向是 **Smooth 策略**. 由于在 forward 过程中 activation 的 outlier 显著多于 weight 的 outlier，于是可以按一定比例缩小 activation，再同比放大 weight 的策略削弱 outlier 影响. [**\[ICML 2023 poster\]SmoothQuant**](https://arxiv.org/abs/2211.10438) 是其中的代表性工作，在 transformer 架构中可以取得较好的效果.
 
@@ -67,12 +66,12 @@ print(f'x_q1: {x_q1}\nx_q2: {x_q2}')
 
 另一个可行的方向则是**混合精度量化**，对 outlier 影响较大的张量做较高 bit 量化，另外张量做低 bit 量化. 但由于 outlier 总是分布在 activation **特定 channel** 中(见 SmoothQuant 原理图)，均匀精度量化以及 layer-wise 的混精度量化策略无法解决 outliers in target weight channel 导致的精度问题，量化后 error 较大. diffusion model 在多步扩散过程中会逐步累积 errors，使得量化后模型表现效果大幅度下降. MPQ-DM 即在这条赛道上开展的工作.
 
-# 论文方法创新
+## 论文方法创新
 MPQ-DM 提出一种 **channel-wise** 的混合精度量化方法，主要分为两个部分，**基于异常值的混合精度量化** (Outlier Driven Mixed Quantization, OMD) 和 **时间平滑相关性蒸馏** (Time Smoothed Relation Distillation, TRD). 
 
 ![Method](../images/MPQ-DM-method.png)
 
-## Outlier-Driven Mixed Quantization
+### Outlier-Driven Mixed Quantization
 MPQ-DM 与 SmoothQuant 进行同样的观察，得到相似的结论：weights 仅在部分 channels 中有显著的 outliers. 基于量化 channel-wise 的特性，OMD 尝试在 **layer weight 的不同 channels** 中采用不同的量化精度，以降低这些显著 channels 的量化误差，
 
 为定量分析不同 channel 的量化难度，OMD 采用所谓**峰度** (Kurtosis) 刻画 channel 的量化难度：outliers 影响越显著的 channel 会具有越大的峰度，即拥有越高的量化难度. 基于 LDM-4 ImageNet 256x256 的 weight distribution 实验图表如下 (横轴为值，纵轴为对应值出现的频次，峰度越大说明离群值 outlier 越多)：
@@ -100,4 +99,13 @@ $$
 $$
 
 这里 $\|C_i\|$ 表示平均量化精度为 $i$ 的集合的元素个数. 同样为加速最优化问题查找最优解参数的过程，OMD 将每组 channels 数固定为 $k = \frac{c\_{\text{out}}}{10}$(当然可以自由设定)，且搜索域约束在 $\left[ 0, \frac{c\_\text{out} // k}{2} \right]$，即搜索次数不会超过 $\frac{c\_\text{out} // k}{2} = 5$. 
+
+这一步确定了各个层权重矩阵的混合精度量化方式，属于是不依赖于 diffusion 时间演化的优化策略，接下来则是针对 diffusion 特有的时间演化过程提出的优化策略.
+
+### Time-Smoothed Relation Distillation
+一般地，最优化量化模型参数是通过与全精度模型对齐，通常由以下损失函数优化模型
+
+$$
+    \mathcal{L}_{\text{tast}} = \parallel \theta_f(\bm{x}_t, t) - \theta_q(\bm{x}_t, t) \parallel^2
+$$  
 
