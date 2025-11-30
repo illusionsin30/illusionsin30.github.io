@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "MPQ-DM 论文学习"
+title: "[AAAI 2025 oral]MPQ-DM"
 date: 2025-11-28
 permalink: /docs/MPQ-DM
 toc: true
 ---
 
 ![MPQ-DM](../images/MPQ-DM.png)
+[MPQ-DM 源代码仓库: wlfeng/MPQ-DM](https://github.com/wlfeng0509/MPQ-DM)
 
 ## 问题背景
 
@@ -24,7 +25,7 @@ $$
 
 $\bm{x}_f$ 为量化前的浮点数张量，在代码实现中类型一般为 `torch.float32`.  $\lfloor \cdot \rceil$ 表示四舍五入取整，$s = \frac{x\_{\max} - x\_{\min}}{2^N-1}$ 为量化缩放比例 (scale)，$z = - \lfloor \frac{l}{s} \rceil$ 为偏置项. $N$ 为量化 bit 数，$\mathrm{clip}$ 表示截断操作，将超出范围的数值截断在 $[0, 2^N -1]$ 中. 
 
-**量化操作将数据近似线性地从 $[\mathrm{min\_{float}}, \mathrm{max\_{float}}]$ 映射到量化后的范围 $[0, 2^N - 1]$**. 在数据参与计算时，则需要逆向变换得到与原始 $\bm{x}\_f$ 相近的张量，即反量化过程：
+**量化操作将数据近似线性地从连续空间 $[\mathrm{min\_{float}}, \mathrm{max\_{float}}]$ 映射到整数离散空间 $[0, 2^N - 1]$**. 在数据参与计算时，则需要逆向变换得到与原始 $\bm{x}\_f$ 相近的张量，即反量化过程：
 
 $$
     \hat{\bm{x}}_f = (\bm{x}_q - z)s
@@ -74,9 +75,31 @@ MPQ-DM 提出一种 **channel-wise** 的混合精度量化方法，主要分为�
 ### Outlier-Driven Mixed Quantization
 MPQ-DM 与 SmoothQuant 进行同样的观察，得到相似的结论：weights 仅在部分 channels 中有显著的 outliers. 基于量化 channel-wise 的特性，OMD 尝试在 **layer weight 的不同 channels** 中采用不同的量化精度，以降低这些显著 channels 的量化误差，
 
-为定量分析不同 channel 的量化难度，OMD 采用所谓**峰度** (Kurtosis) 刻画 channel 的量化难度：outliers 影响越显著的 channel 会具有越大的峰度，即拥有越高的量化难度. 基于 LDM-4 ImageNet 256x256 的 weight distribution 实验图表如下 (横轴为值，纵轴为对应值出现的频次，峰度越大说明离群值 outlier 越多)：
+为定量分析不同 channel 的量化难度，OMD 采用所谓**峰度** (Kurtosis, 即四阶标准矩) 刻画 channel 的量化难度：设 $X$ 表示一个遵循某个分布的随机变量，其均值为 $\mu$，标准差为 $\sigma$，峰度的定义如下
+
+$$
+    Kurt(X) = \frac{\mu_4}{\sigma^4} \\
+    \mu_4 = \mathbb{E}\left[ (X - \mu)^4 \right]
+$$
+
+outliers 影响越显著的 channel 会具有越大的峰度，即拥有越高的量化难度. 基于 LDM-4 ImageNet 256x256 的 weight distribution 实验图表如下 (横轴为值，纵轴为对应值出现的频次，峰度越大说明离群值 outlier 越多)：
 
 ![Kurtosis](../images/MPQ-DM-kurtosis.png)
+
+计算峰度的源代码实现如下：
+
+```python
+# quant_scripts/quant_layer.py
+def calculate_kurtosis_per_channel(data):
+    mean = torch.mean(data, dim=-1, keepdim=True)
+    std = torch.std(data, dim=-1)
+    
+    fourth_moment_mean = torch.mean((data - mean) ** 4, dim=-1)
+    
+    kurtosis_per_channel = fourth_moment_mean / (std ** 4)
+    
+    return kurtosis_per_channel
+```
 
 这里 OMD 采用了 SmoothQuant 同种 smooth 方法对输入和矩阵进行 channel-wise smooth 处理，原论文中将这步处理称为 **pre-scaled**.
 
@@ -84,6 +107,36 @@ $$
     \delta_i = \sqrt{\frac{\max (|\bm{W}_i|)}{\max (|\bm{X}_i|)}} \\
     \bm{Y} = (\bm{X}\mathrm{diag}(\delta))\cdot (\mathrm{diag}(\delta)^{-1}\bm{W}^T) = \hat{\bm{X}}\cdot \hat{\bm{W}}^T
 $$
+
+源代码处实现如下：
+
+```python
+# quant_scripts/quant_layer.py/QuantModule
+def forward(self, input: torch.Tensor):
+    if not self.ignore_reconstruction and not self.weight_quantizer.inited:
+        if len(self.weight.shape) == 4:
+            scale = input.abs().max(dim=3, keepdim=True)[0].max(dim=2, keepdim=True)[0].max(dim=0, keepdim=True)[0]
+            scale_weight = self.weight.abs().max(dim=-1)[0].max(dim=-1)[0].max(dim=0)[0]
+            scale = torch.sqrt(scale.permute(0, 2, 3, 1) / scale_weight).permute(0, 3, 1, 2)
+            self.register_buffer('weight_scale', scale)
+            self.register_buffer('activation_scale', 1.0 / scale)
+            
+            weight = self.weight * self.weight_scale
+            weight = weight.flatten(1)
+            weight = calculate_kurtosis_per_channel(weight)
+        else:
+            scale = input.abs().max(dim=0)[0]
+            if len(scale.shape) == 2:
+                scale = scale.max(dim=0)[0]
+            scale_weight = self.weight.abs().max(dim=0)[0]
+            scale = torch.sqrt(scale / scale_weight)
+            scale = scale.squeeze()
+            self.register_buffer('weight_scale', scale)
+            self.register_buffer('activation_scale', 1.0 / scale)
+        
+            weight = self.weight * self.weight_scale
+            weight = calculate_kurtosis_per_channel(weight)
+```
 
 而后 OMD 对平滑后的权重矩阵 $\hat{\bm{W}}$ 的各个 channel 计算峰度 $\kappa$ 并排序得到一组由高到低排序的峰度序列. 假设 $n$ 表示 weight 中的 channels 数，$N$ 为目标平均量化 bit 数，$\hat{Q}$ 表示量化与反量化过程算符，$c_i$ 表示第 $i$ 个 channel 的量化精度，OMD 将量化精度选择归结为以下优化问题：
 
@@ -100,12 +153,216 @@ $$
 
 这里 $\|C_i\|$ 表示平均量化精度为 $i$ 的集合的元素个数. 同样为加速最优化问题查找最优解参数的过程，OMD 将每组 channels 数固定为 $k = \frac{c\_{\text{out}}}{10}$(当然可以自由设定)，且搜索域约束在 $\left[ 0, \frac{c\_\text{out} // k}{2} \right]$，即搜索次数不会超过 $\frac{c\_\text{out} // k}{2} = 5$. 
 
+来看看源代码实现：
+
+```python
+# quant_scripts/quant_layer.py/QuantModule
+def forward(self, input: torch.Tensor):
+    if not self.ignore_reconstruction and not self.weight_quantizer.inited:
+        ...
+        # 这里初始化三个集合和要优化的 error 值
+        small_wq_params = {'n_bits': self.weight_quant_params['n_bits']-1, 'channel_wise': True, 'scale_method': 'max'}
+        mid_wq_params = {'n_bits': self.weight_quant_params['n_bits'], 'channel_wise': True, 'scale_method': 'max'}
+        large_res_wq_params = {'n_bits': self.weight_quant_params['n_bits']+1, 'channel_wise': True, 'scale_method': 'max'}
+
+        out_channel = weight.shape[0]
+        now_err = torch.tensor(float('inf'))
+        now_mask_small = None
+        now_mask_mid = None
+        now_mask_large = None
+        best_split = 0
+        fp_out = self.fwd_func(input, self.weight, self.bias, **self.fwd_kwargs)
+
+        # 这里开始搜索，搜索次数限制在这个次数之内
+        # for search_num in range(0, out_channel//2+1, out_channel//10):
+        for search_num in [0, out_channel//10]:
+            # 用 topk 找出需要升精度和降精度的 channels，为他们制作 mask
+            _, top_half_columns = torch.topk(weight, search_num)
+            _, least_half_columns = torch.topk(weight, search_num, largest=False)
+            mask_small = torch.full(self.weight.shape, False).to(self.weight.device)
+            mask_large = torch.full(self.weight.shape, False).to(self.weight.device)
+            if len(self.weight.shape) == 4:
+                mask_large[top_half_columns, :, :, :] = True
+                mask_small[least_half_columns, :, :, :] = True
+            else:
+                mask_large[top_half_columns, :] = True
+                mask_small[least_half_columns, :] = True
+
+            mask_mid = ~(mask_large | mask_small)
+            # mask_mid = ~(mask_small)
+            # 这里开始配置各个集合的量化类，里面有负责量化和逆量化的函数
+            small_weight_quantizer = UniformAffineQuantizer(**small_wq_params, mask=mask_small)
+            small_weight = small_weight_quantizer(torch.where(mask_small, self.weight * self.weight_scale, 0.))
+            mid_weight_quantizer = UniformAffineQuantizer(**mid_wq_params, mask=mask_mid)
+            mid_weight = mid_weight_quantizer(torch.where(mask_mid, self.weight * self.weight_scale, 0.))
+            large_res_weight_quantizer = UniformAffineQuantizer(**large_res_wq_params, mask=mask_large)
+            large_res_weight = large_res_weight_quantizer(torch.where(mask_large, self.weight * self.weight_scale, 0.))
+
+            # 由于是分开量化的，所以最后要加起来构成 quant_weight
+            quant_weight = small_weight + mid_weight+ large_res_weight
+            # 这里延续 smooth 操作，将 input 缩小
+            quant_out = self.fwd_func(input * self.activation_scale, quant_weight, self.bias, **self.fwd_kwargs)
+            tmp_err = F.mse_loss(quant_out, fp_out)
+            if tmp_err < now_err:
+                now_err = tmp_err
+                now_mask_large = mask_large
+                now_mask_mid = mask_mid
+                now_mask_small = mask_small   
+                best_split = search_num     
+
+        self.register_buffer('weight_mask_large', now_mask_large)
+        self.register_buffer('weight_mask_mid', now_mask_mid)
+        self.register_buffer('weight_mask_small', now_mask_small)
+        del self.weight_quantizer
+
+        n_bits = self.weight_quant_params['n_bits']
+        self.weight_quant_params['n_bits'] = n_bits+1
+        self.weight_quantizer_large_res = UniformAffineQuantizer(**self.weight_quant_params, mask=self.weight_mask_large)
+        self.weight_quant_params['n_bits'] = n_bits-1
+        self.weight_quantizer_small = UniformAffineQuantizer(**self.weight_quant_params, mask=self.weight_mask_small)
+        self.weight_quant_params['n_bits'] = n_bits
+        self.weight_quantizer_mid = UniformAffineQuantizer(**self.weight_quant_params, mask=self.weight_mask_mid)
+        print(f'best split is {best_split / out_channel}')
+```
+
 这一步确定了各个层权重矩阵的混合精度量化方式，属于是不依赖于 diffusion 时间演化的优化策略，接下来则是针对 diffusion 特有的时间演化过程提出的优化策略.
 
 ### Time-Smoothed Relation Distillation
 一般地，最优化量化模型参数是通过与全精度模型对齐，通常由以下损失函数优化模型
 
 $$
-    \mathcal{L}_{\text{tast}} = \parallel \theta_f(\bm{x}_t, t) - \theta_q(\bm{x}_t, t) \parallel^2
+    \mathcal{L}_{\text{target}} = \parallel \theta_f(\bm{x}_t, t) - \theta_q(\bm{x}_t, t) \parallel^2
 $$  
 
+其中 $\theta\_f, \theta\_q$ 分别表示全精度模型与量化模型，$\bm{x}_t$ 是经 $T-t$ 步迭代反向扩散高斯噪声 $\bm{x}_T \sim \mathcal{N}(0, \bm{I})$ 得到的. 
+
+在极其低精度的量化模型中，通常会将最后一个 projection layer 设置为高精度 (8-bit). TRD 考虑利用全精度模型特征层来调整量化模型低精度特征层，即蒸馏过程. 记 $\mathcal{D}$ 为衡量两个模型 feature map 的策略(这里 feature map 就是指输入通过某一层后的输出)，$\bm{F}_f$ 为全精度模型的 feature map, $\bm{F}_q$ 为量化模型的 feature map, 设置以下**蒸馏过程损失函数**：
+
+$$
+    \mathcal{L}_{\text{dis}} = \mathcal{D}(\bm{F}_f, \bm{F}_q)
+$$
+
+基于对模型 feature map 和 cosine similarity map 的观察，TRD 在这里舍弃掉无法规避离散空间与连续空间不同点的 $\mathrm{L2}$ loss 函数，而是用 **KL 散度**联系量化模型与全精度模型各个层 feature map 在输入序列分布的相关性. 设模型后 $t$ 步累加的 feature map $\hat{\bm{F}} = \sum_{t=0}^N \bm{F}_{T - t} \in \mathbb{R}^{h \times w \times c}$，加入脚标 $f, q$ 分别代表全精度和量化模型，那么很自然可以用内积形式求出模型某一层 feature map 序列中不同元素之间的关联度
+
+$$
+    \hat{\bm{S}}^i = \hat{\bm{F}}^i\hat{\bm{F}}^T \in \mathbb{R}^s
+$$
+
+那么就可以构造 TRD 损失函数
+
+$$
+    \mathcal{L}_{dis} = \sum_{i=1}^s \mathcal{D}_{kl} \left( \hat{\bm{S}}^i_f \parallel \hat{\bm{S}}^i_q \right)
+$$
+
+为 $\mathcal{L}\_{dis}$ 添加一个学习率因子 $\lambda \in [0, 1]$，则整体优化问题的目标函数就可以定义为
+
+$$
+    \mathcal{L}_{total} = \mathcal{L}_{target} + \lambda \mathcal{L}_{dis}
+$$
+
+来看看源代码：
+
+```python
+# MPQ-DM/ldm/models/diffusion/ddim.py/OurDDIMSampler_trainer
+def pair_wise_sim_map_speed(self, fea_0, fea_1):
+    '计算 feature map 不同位置元素之间的相似关系图'
+    B, C, H, W = fea_0.size()
+
+    fea_0 = fea_0.reshape(B, C, -1).transpose(1, 2)
+    fea_1 = fea_1.reshape(B, C, -1)
+    
+    sim_map = torch.bmm(fea_0, fea_1)
+    return sim_map.reshape(-1, sim_map.shape[-1])
+
+def relational_loss(self, fea_0, fea_1):
+    '计算相关性 loss'
+    s_sim_map = self.pair_wise_sim_map_speed(fea_0, fea_0)
+    t_sim_map = self.pair_wise_sim_map_speed(fea_1, fea_1)
+
+    # 这里选用log_softmax应当是为了规避梯度爆炸等问题
+    p_s = F.log_softmax(s_sim_map / 1.0, dim=1)
+    p_t = F.softmax(t_sim_map / 1.0, dim=1)
+
+    sim_dis = F.kl_div(p_s, p_t, size_average=False) * 100.
+    return sim_dis
+
+def p_sample_ddim(self, x, c, t, index, repeat_noise=False, use_original_steps=False, quantize_denoised=False,
+                      temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
+                      unconditional_guidance_scale=1., unconditional_conditioning=None):
+    '蒸馏模型并输出 sample 结果.'
+    b, *_, device = *x.shape, x.device
+    optimizer_state = globalvar.getStep(index)
+    if optimizer_state is not None:
+        self.optimizer.load_state_dict(optimizer_state)
+    self.optimizer.zero_grad()
+    
+    alphas = self.model.alphas_cumprod if use_original_steps else self.ddim_alphas
+    alphas_prev = self.model.alphas_cumprod_prev if use_original_steps else self.ddim_alphas_prev
+    sqrt_one_minus_alphas = self.model.sqrt_one_minus_alphas_cumprod if use_original_steps else self.ddim_sqrt_one_minus_alphas
+    sigmas = self.model.ddim_sigmas_for_original_num_steps if use_original_steps else self.ddim_sigmas
+    # select parameters corresponding to the currently considered timestep
+    a_t = torch.full((b, 1, 1, 1), alphas[index], device=device)
+    a_prev = torch.full((b, 1, 1, 1), alphas_prev[index], device=device)
+    sigma_t = torch.full((b, 1, 1, 1), sigmas[index], device=device)
+    sqrt_one_minus_at = torch.full((b, 1, 1, 1), sqrt_one_minus_alphas[index],device=device)
+
+    # 得到全精度模型输出和量化模型输出
+    if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
+
+        e_t = self.model.apply_model(x, t, c)
+        quant_e_t = self.quant_model.apply_model(x, t, c)
+
+    else: ## run here
+        x_in = torch.cat([x] * 2).detach()
+        t_in = torch.cat([t] * 2).detach()
+        c_in = torch.cat([unconditional_conditioning, c]).detach()
+
+        e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
+        e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
+
+        quant_e_t_uncond, quant_e_t = self.quant_model.apply_model(x_in, t_in, c_in).chunk(2)
+        quant_e_t = quant_e_t_uncond + unconditional_guidance_scale * (quant_e_t - quant_e_t_uncond)
+
+    # L_{target}
+    loss = F.mse_loss(quant_e_t, e_t, size_average=False)
+
+    self.distill_step += 1
+    # 两个蒸馏步在原有 loss 基础上加上 L_{dis}，应当是基于原理式设置 T=2
+    if self.distill_step == 2:
+        self.distill_step = 0
+
+        fp_feat = torch.stack(self.fp_outputs)
+        fp_feat = torch.mean(fp_feat, dim=0)
+        fp_feat = F.normalize(fp_feat, p=2, dim=1)
+
+        q_feat = torch.stack(self.quant_outputs)
+        q_feat = torch.mean(q_feat, dim=0)
+        q_feat = F.normalize(q_feat, p=2, dim=1)
+
+        loss += self.relational_loss(q_feat, fp_feat)
+        
+        self.fp_outputs.clear()
+        self.quant_outputs.clear()
+
+    loss.backward()
+    self.optimizer.step()
+    self.lr_scheduler.step()
+
+    globalvar.saveStep(index, optimizer_state)
+
+    if score_corrector is not None: ## do not run
+        assert self.model.parameterization == "eps"
+        e_t = score_corrector.modify_score(self.model, e_t, x, t, c, **corrector_kwargs)
+
+    # current prediction for x_0
+    pred_x0 = (x - sqrt_one_minus_at * e_t) / a_t.sqrt()
+    if quantize_denoised: ## do not run
+        pred_x0, _, *_ = self.model.first_stage_model.quantize(pred_x0)
+    # direction pointing to x_t
+    dir_xt = (1. - a_prev - sigma_t**2).sqrt() * e_t
+    noise = sigma_t * noise_like(x.shape, device, repeat_noise) * temperature
+    if noise_dropout > 0.:
+        noise = torch.nn.functional.dropout(noise, p=noise_dropout)
+    x_prev = a_prev.sqrt() * pred_x0 + dir_xt + noise
+    return x_prev, pred_x0
+```
