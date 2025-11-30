@@ -5,6 +5,6 @@
   {% assign words = content | number_of_words %}
   <p><strong>字数:</strong> {{ words }} 字</p>
   
-  {% assign read_time = words | divided_by: 300 | plus: 1 %}
+  {% assign read_time = words | divided_by: 120 | plus: 1 %}
   <p><strong>阅读:</strong> 约 {{ read_time }} 分钟</p>
 </div>
