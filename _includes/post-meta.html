@@ -1,50 +1,10 @@
-<!-- _includes/post-meta.html (升级版) -->
-<div class="post-meta">
+<div class="meta-info">
+  <p><strong>作者:</strong> {{ page.author | default: site.github_username }}</p>
+  <p><strong>日期:</strong> {{ page.date | date: "%Y-%m-%d" }}</p>
   
-  <!-- 1. 发布日期 -->
-  <span class="meta-item">
-    <i class="far fa-calendar-alt"></i>
-    <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-      {{ page.date | date: "%B %-d, %Y" }}
-    </time>
-  </span>
-
-  <!-- 2. 字数统计 -->
-  <span class="meta-item">
-    <i class="fas fa-file-word"></i>
-    {% assign words = content | number_of_words %}
-    {{ words }} words
-  </span>
-
-  <!-- 3. 阅读时长 -->
-  <span class="meta-item">
-    <i class="far fa-clock"></i>
-    {% assign read_time = words | divided_by: 60 | plus: 1 %}
-    {{ read_time }} min read
-  </span>
-
-  <!-- 4. 作者 (仅当在 Front Matter 中指定时显示) -->
-  {% if page.author %}
-  <span class="meta-item">
-    <i class="far fa-user"></i>
-    <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <span itemprop="name">{{ page.author }}</span>
-    </span>
-  </span>
-  {% endif %}
-
-<!-- 5. 目录 (JS 版) -->
-  <span class="meta-item meta-toc-container" id="toc-container" style="display:none;">
-    <details class="meta-toc">
-        <summary>
-            <i class="fas fa-list-ul"></i> 目录
-        </summary>
-        <div class="toc-content" id="toc-content">
-            <!-- JS 将在这里注入目录 -->
-        </div>
-    </details>
-  </span>
-
+  {% assign words = content | number_of_words %}
+  <p><strong>字数:</strong> {{ words }} 字</p>
   
-
+  {% assign read_time = words | divided_by: 300 | plus: 1 %}
+  <p><strong>阅读:</strong> 约 {{ read_time }} 分钟</p>
 </div>

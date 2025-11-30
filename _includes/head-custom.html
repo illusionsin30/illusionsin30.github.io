@@ -1,28 +1,28 @@
-<!-- 1. Google Analytics 4 (直接集成，无需额外的 include 文件) -->
-<!-- 仅在生产环境且已配置 ID 时加载，防止本地开发污染数据 -->
-{% if site.google_analytics and jekyll.environment == 'production' %}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title | escape }} | {% endif %}{{ site.title | escape }}</title>
+  
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  
+  <!-- 1. Google Fonts: Noto Serif (正文) + JetBrains Mono (代码完美渲染) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- 2. Icons & KaTeX -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+  <!-- 3. 深色模式初始化脚本 (防闪烁) -->
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{{ site.google_analytics }}');
+    const userPref = localStorage.getItem('theme');
+    const systemPref = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (userPref === 'dark' || (!userPref && systemPref)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   </script>
-{% endif %}
-
-<!-- 2. Favicon 图标设置 (已启用并增强) -->
-<!-- 标准图标 (放在根目录或 assets/images 下) -->
-<link rel="shortcut icon" href="{{ '/favicon.ico' | relative_url }}" type="image/x-icon">
-<link rel="icon" href="{{ '/favicon.ico' | relative_url }}" type="image/x-icon">
-
-<!-- Apple 设备专用图标 (建议 180x180 png) -->
-<!-- 如果你没有这个图片，可以将 href 指向你的头像或 logo -->
-<link rel="apple-touch-icon" href="{{ '/assets/images/apple-touch-icon.png' | relative_url }}">
-
-<!-- 3. RSS 订阅自动发现 -->
-<!-- 让浏览器或 RSS 阅读器能自动检测到你的博客订阅源 -->
-<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
-
-<!-- 4. 移动端浏览器主题色 -->
-<!-- 设置浏览器地址栏颜色，使其与你的网站风格一致 (修改 content 里的颜色值) -->
-<meta name="theme-color" content="#ffffff">
+</head>

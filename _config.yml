@@ -1,40 +1,30 @@
-# 网站基础信息
-title: Mumu
-repository: illusionsin30/illusionsin30.github.io
-description: A personal workspace for casual notes on machine learning and something else.
-url: "https://illusionsin30.github.io" # 建议填上，利于 SEO
+title: mumu
+email: gugusine773@gmail.com
+description: >- # 用于 SEO
+  A personal workspace for casual notes on machine learning and something else.
+baseurl: "" # 这里的如果是根目录则留空
+url: "" 
+github_username: illusionsin30 # 替换为你的 GitHub 用户名
+repository: illusionsin30/illusionsin30.github.io # 用于获取 Branch 信息
 
-# --------------------------
-# 主题设置 (二选一，GitHub Pages 推荐用 remote_theme)
-# --------------------------
-remote_theme: pages-themes/minimal@v0.2.0
-# theme: jekyll-theme-minimal  <-- 删掉这一行，避免冲突
-
-show_downloads: false
-
-# --------------------------
-# 插件设置
-# --------------------------
-plugins:
-  - jekyll-remote-theme
-  - jekyll-seo-tag
-  - jekyll-sitemap       # 新增：自动生成 sitemap.xml，利于 Google 收录
-  - jekyll-feed          # 新增：生成 RSS 订阅源
-  - jekyll-toc
-
-# --------------------------
-# Analytics (填入你的 GA4 ID, G-开头)
-# --------------------------
-
-# --------------------------
-# Markdown & 排版设置
-# --------------------------
+# Build settings
 markdown: kramdown
+theme: null # 因为我们是手动写 layout，这里设为 null 或注释掉
 kramdown:
-  input: GFM             # GitHub Flavored Markdown
-  math_engine: nil
-  auto_ids: true
-  toc_levels: 1..6
+  input: GFM
+  syntax_highlighter: rouge
 
-# 永久链接格式 (推荐)
-permalink: /:year/:month/:day/:title/
+# 这一步不是必须的，但如果你的代码块没有颜色，尝试添加这个
+highlighter: rouge
+
+# 插件（GitHub Pages 支持）
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
