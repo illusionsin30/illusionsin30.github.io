@@ -1,29 +1,33 @@
 ---
-layout: default
+layout: home
+title: Home
 ---
 
-# 欢迎
+## 欢迎
 这是主播在 Machine Learning 学习过程中做笔记的网站，目前会涉及到的方向主要是：
 
-- 自然语言处理
-- 文生图模型 (DiT)
-- ……
+- 课程笔记：包括但不限于数理基础课程，计算机基础课程等.
+- 论文阅读：部分前沿论文阅读，目前主要聚焦在 DiT 和 Linear Attention 上.
+- 部分 machine learning 基础知识笔记
+- $\cdots$
 
-# 笔记导航
+如果这个网页有帮助你，或者你想共同建设这个网页，可以通过网页中我的 github 主页以及个人邮箱 (gugusine773@gmail.com) 联系我.
 
-## Topology 学习笔记
-- [Week10](/topology/TopoWeek10)
+## 笔记导航
+### 学习笔记
+#### Topology
+[Week10: 同伦与基本群](/topology/TopoWeek10)
 
-## Machine Learning 基础学习
+### Machine Learning 基础学习
 
-- [Transformer架构解读](/ML/transformer)
-- [GPT与BERT架构](/ML/GPTandBert)
+[Transformer架构解读](/ML/transformer)
+[GPT与BERT架构](/ML/GPTandBert)
 
-## 前沿论文阅读笔记
+### 前沿论文阅读笔记
 
-### 模型架构优化
-- [\[AAAI 2025 oral\]MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/articles/MPQ-DM)
-- [\[ECCV 2024\]MixDQ: Memory-Efficient Few-Step Text-to-Image Diffusion Models with Metric-Decoupled Mixed Precision Quantization](/articles/MixDQ)
+#### 模型架构优化
+[\[**AAAI 2025 oral**\]MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/articles/MPQ-DM)
+[\[**ECCV 2024**\]MixDQ: Memory-Efficient Few-Step Text-to-Image Diffusion Models with Metric-Decoupled Mixed Precision Quantization](/articles/MixDQ)
 
 目前很多笔记仍在进行中，主播努力学习ing...
 
