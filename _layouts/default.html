@@ -34,10 +34,14 @@
               <!-- Git Branch Info (交互式跳转) -->
               <li>
                 {% assign branch_name = site.github.source.branch | default: 'main' %}
-                {% assign repo_url = site.github.repository_url | default: site.github_username | append: '/' | append: site.repository %}
-                
+                {% if site.github.repository_url %}
+                  {% assign repo_url = site.github.repository_url %}
+                {% else %}
+                  <!-- 本地回退逻辑：手动拼接 https://github.com/ + user/repo -->
+                  {% assign repo_url = "https://github.com/" | append: site.repository %}
+                {% endif %}
                 <!-- 构建 Branch URL: https://github.com/User/Repo/tree/Branch -->
-                <a href="tree/{{ branch_name }}" target="_blank" class="icon-link branch-link" title="Current Branch">
+                <a href="{{ repo_url }}/tree/{{ branch_name }}" target="_blank" class="icon-link branch-link" title="Current Branch">
                   <span class="icon"><i class="fas fa-code-branch"></i></span>
                   <span class="text">
                     {{ branch_name }}
