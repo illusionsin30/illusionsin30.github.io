@@ -37,7 +37,7 @@
                 {% assign repo_url = site.github.repository_url | default: site.github_username | append: '/' | append: site.repository %}
                 
                 <!-- 构建 Branch URL: https://github.com/User/Repo/tree/Branch -->
-                <a href="{{ repo_url }}/tree/{{ branch_name }}" target="_blank" class="icon-link branch-link" title="Current Branch">
+                <a href="tree/{{ branch_name }}" target="_blank" class="icon-link branch-link" title="Current Branch">
                   <span class="icon"><i class="fas fa-code-branch"></i></span>
                   <span class="text">
                     {{ branch_name }}
