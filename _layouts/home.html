@@ -1,0 +1,33 @@
+---
+layout: default
+---
+
+<!-- 1. Wiki 风格的主体内容区 -->
+<div class="wiki-content fade-in-up">
+  {{ content }}
+</div>
+
+<!-- 2. (可选) 下方依然保留“最新文章”流，作为补充 -->
+<!-- 如果你只想显示 index.md 的内容，可以删除下面的所有代码 -->
+<div class="latest-posts-divider">
+  <span>LATEST POSTS</span>
+</div>
+
+<div class="post-list-container">
+  {% for post in paginator.posts limit:5 %}
+    <article class="post-card fade-in-up">
+      <div class="post-meta">
+        <span class="post-date">{{ post.date | date: "%Y-%m-%d" }}</span>
+        {% if post.categories.size > 0 %}
+        <span class="post-category">{{ post.categories | first }}</span>
+        {% endif %}
+      </div>
+      <h3 class="post-title">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </h3>
+      <a href="{{ post.url | relative_url }}" class="read-more-link">
+        Read <i class="fas fa-arrow-right"></i>
+      </a>
+    </article>
+  {% endfor %}
+</div>

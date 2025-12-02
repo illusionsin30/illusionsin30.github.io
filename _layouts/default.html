@@ -1,100 +1,99 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- SEO 插件 -->
-    {% seo %}
-
-    <!-- 1. 资源预加载 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-
-    <!-- 2. 引入 Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-    
-    <!-- 3. 引入 FontAwesome 图标库 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- 4. 你的主样式表 -->
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-    
-    <!-- ======================================================= -->
-    <!-- KaTeX 配置 -->
-    <!-- ======================================================= -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
-          delimiters: [
-              {left: '$$', right: '$$', display: true},
-              {left: '$', right: '$', display: false},
-              {left: '\\(', right: '\\)', display: false},
-              {left: '\\[', right: '\\]', display: true}
-          ],
-          throwOnError : false
-      });">
-    </script>
-
-    {% include head-custom.html %}
-    
-  </head>
-  
+<html lang="{{ page.lang | default: site.lang | default: 'zh-CN' }}">
+  {% include head-custom.html %}
   <body>
-    <a class="skip-to-content" href="#main-content">Skip to content</a>
-
     <div class="wrapper">
-      
-      <header>
-        <div class="header-profile">
-          <a href="{{ "/" | absolute_url }}" class="site-avatar">
-            {% if site.logo %}
-              <img src="{{ site.logo | relative_url }}" alt="{{ site.title }}" />
-            {% else %}
-              <img src="https://github.com/{{ site.github.owner_name }}.png" alt="{{ site.title }}" />
-            {% endif %}
-          </a>
-          
-          <h1 class="site-title"><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
-          <p class="site-description">{{ site.description | default: site.github.project_tagline }}</p>
-        </div>
-
-        <nav class="site-nav">
-          <div class="social-links">
-            {% if site.github.owner_url %}
-              <a href="{{ site.github.owner_url }}" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
-            {% endif %}
-            <a href="mailto:gugusine773@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
-            
-            {% if site.show_downloads %}
-              <a href="{{ site.github.zip_url }}" aria-label="Download ZIP"><i class="fas fa-download"></i></a>
-            {% endif %}
+      <header class="sidebar">
+        <div class="sidebar-inner">
+          <div class="profile-section">
+            <a href="{{ site.github.url }}/" class="avatar-link">
+              <img src="https://github.com/{{ site.github_username }}.png" alt="Avatar" class="avatar">
+            </a>
+            <h2 class="site-title"><a href="{{ site.github.url }}/">{{ site.title }}</a></h2>
           </div>
-          
-          {% if site.github.is_project_page %}
-            <div class="project-links">
-              <a href="{{ site.github.repository_url }}" class="btn-outline">View Project <i class="fas fa-code-branch"></i></a>
+
+          <!-- 侧边栏导航区：图标 + 文字 -->
+          <nav class="info-section">
+            <ul class="contact-list">
+              <!-- GitHub -->
+              <li>
+                <a href="https://github.com/{{ site.github_username }}" target="_blank" class="icon-link" title="GitHub">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span class="text">GitHub Profile</span>
+                </a>
+              </li>
+              
+              <!-- Email -->
+              <li>
+                <a href="mailto:{{ site.email }}" class="icon-link" title="Email">
+                  <span class="icon"><i class="fas fa-envelope"></i></span>
+                  <span class="text">Email Me</span>
+                </a>
+              </li>
+
+              <!-- Git Branch Info (交互式跳转) -->
+              <li>
+                {% assign branch_name = site.github.source.branch | default: 'main' %}
+                {% if site.github.repository_url %}
+                  {% assign repo_url = site.github.repository_url %}
+                {% else %}
+                  <!-- 本地回退逻辑：手动拼接 https://github.com/ + user/repo -->
+                  {% assign repo_url = "https://github.com/" | append: site.repository %}
+                {% endif %}
+                <!-- 构建 Branch URL: https://github.com/User/Repo/tree/Branch -->
+                <a href="{{ repo_url }}/tree/{{ branch_name }}" target="_blank" class="icon-link branch-link" title="Current Branch">
+                  <span class="icon"><i class="fas fa-code-branch"></i></span>
+                  <span class="text">
+                    {{ branch_name }}
+                    {% if site.github.build_revision %}
+                    <span class="commit-hash">({{ site.github.build_revision | slice: 0, 7 }})</span>
+                    {% endif %}
+                  </span>
+                </a>
+              </li>
+
+              <li>
+                <div class="icon-link theme-toggle" onclick="toggleTheme()">
+                  <span class="icon" id="theme-icon"><i class="fas fa-moon"></i></span>
+                  <span class="text" id="theme-text">Dark Mode</span>
+                </div>
+              </li>
+            </ul>
+          </nav>
+
+          {% if page.layout == 'post' %}
+            <div class="post-sidebar-meta">
+              <hr>
+              {% include post-meta.html %}
+              <div id="toc-container" class="toc-container">
+                <h3><i class="fas fa-list-ul"></i> 目录</h3>
+                <div id="toc"></div>
+              </div>
             </div>
           {% endif %}
-        </nav>
-
-        <!-- 侧边栏目录容器 -->
-        <div id="sidebar-toc" class="sidebar-toc"></div>
-
+        </div>
       </header>
 
-      <main id="main-content">
+      <section class="main-content">
         {{ content }}
-      </main>
-
-      <footer>
-        <p>
-          &copy; {{ site.time | date: '%Y' }} {{ site.title }}. 
-          <span class="footer-credit">Theme by <a href="https://github.com/orderedlist">orderedlist</a></span>
-        </p>
-      </footer>
+        <footer class="site-footer">
+          <p class="copyright">© {{ site.time | date: '%Y' }} {{ site.title }}. Powered by Jekyll.</p>
+        </footer>
+      </section>
     </div>
+    
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+    
+    <!-- KaTeX 自动渲染配置 -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ]
+        });
+      });
+    </script>
   </body>
 </html>

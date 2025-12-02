@@ -2,355 +2,91 @@
 layout: default
 ---
 
-<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-
-  <!-- 1. 头部区域 -->
+<article class="post-content">
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-    
-    <!-- 
-       注意：请确保你的 _includes/post-meta.html 中包含了如下结构：
-       <span class="meta-item meta-toc-container" id="toc-container" style="display:none;">
-         <details class="meta-toc">
-           <summary><i class="fas fa-list-ul"></i> 目录</summary>
-           <div class="toc-content" id="toc-content"></div>
-         </details>
-       </span>
-    -->
-    {% include post-meta.html %}
+    <h1 class="post-title">{{ page.title }}</h1>
+    <p class="post-date"><i class="far fa-calendar-alt"></i> {{ page.date | date: "%Y-%m-%d" }}</p>
   </header>
 
-  <!-- 2. 正文区域 -->
-  <!-- 增加了 class="js-toc-content" 方便 JS 定位 -->
-  <div class="post-content js-toc-content" itemprop="articleBody">
+  <div class="post-body">
     {{ content }}
   </div>
 
-  <!-- 3. 底部区域 -->
-  <footer class="post-footer">
-    
-    <!-- 标签 (Tags) -->
-    {% if page.tags.size > 0 %}
-      <div class="post-tags">
-        <i class="fas fa-tags tag-icon"></i>
-        {% for tag in page.tags %}
-          <span class="tag-pill">{{ tag }}</span>
-        {% endfor %}
-      </div>
+  <!-- 
+    === 核心修复逻辑：基于子文件夹的独立索引 === 
+  -->
+  <div class="post-navigation">
+    <!-- 1. 获取当前文章的目录路径 (不包含文件名) -->
+    {% assign path_array = page.path | split: '/' %}
+    {% assign array_size = path_array | size %}
+    {% assign dir_depth = array_size | minus: 1 %}
+    {% assign current_dir = path_array | slice: 0, dir_depth | join: '/' %}
+
+    <!-- 2. 创建一个空数组用于存放同目录的文章 -->
+    {% assign sibling_posts = "" | split: "" %}
+
+    <!-- 3. 遍历所有文章，筛选出物理路径相同的文章 -->
+    {% for post in site.posts %}
+      {% assign post_path_array = post.path | split: '/' %}
+      {% assign post_array_size = post_path_array | size %}
+      {% assign post_dir_depth = post_array_size | minus: 1 %}
+      {% assign post_dir = post_path_array | slice: 0, post_dir_depth | join: '/' %}
+
+      {% if post_dir == current_dir %}
+        {% assign sibling_posts = sibling_posts | push: post %}
+      {% endif %}
+    {% endfor %}
+
+    <!-- 
+      注意：site.posts 默认是按时间【从新到旧】排序的。
+      筛选出的 sibling_posts 依然保持这个顺序：
+      Index 0: 最新 (Newest)
+      ...
+      Index N: 最旧 (Oldest)
+    -->
+
+    <!-- 4. 在筛选后的数组中找到当前文章的索引 -->
+    {% assign currIndex = -1 %}
+    {% for post in sibling_posts %}
+      {% if post.path == page.path %}
+        {% assign currIndex = forloop.index0 %}
+      {% endif %}
+    {% endfor %}
+
+    <!-- 5. 计算逻辑索引 -->
+    <!-- 下一篇 (更近的日期) = 索引减 1 -->
+    {% assign nextIndex = currIndex | minus: 1 %}
+    <!-- 上一篇 (更远的日期) = 索引加 1 -->
+    {% assign prevIndex = currIndex | plus: 1 %}
+
+    <!-- 6. 渲染按钮 -->
+    <!-- 上一篇 (旧文章) -->
+    {% if prevIndex < sibling_posts.size %}
+      {% assign prev_post = sibling_posts[prevIndex] %}
+      <a class="nav-btn prev" href="{{ prev_post.url | relative_url }}">
+        <span class="label"><i class="fas fa-arrow-left"></i> 上一篇</span>
+        <span class="title">{{ prev_post.title }}</span>
+      </a>
+    {% else %}
+      <div class="nav-btn-placeholder"></div>
     {% endif %}
 
-    <hr class="footer-divider">
+    <!-- 下一篇 (新文章) -->
+    {% if nextIndex >= 0 %}
+      {% assign next_post = sibling_posts[nextIndex] %}
+      <a class="nav-btn next" href="{{ next_post.url | relative_url }}">
+         <span class="label">下一篇 <i class="fas fa-arrow-right"></i></span>
+         <span class="title">{{ next_post.title }}</span>
+      </a>
+    {% else %}
+      <div class="nav-btn-placeholder"></div>
+    {% endif %}
 
-    <!-- 导航 -->
-    <nav class="post-navigation">
-      <div class="nav-links">
-        {% if page.previous.url %}
-          <a class="nav-link prev" href="{{ page.previous.url | relative_url }}">
-            <div class="nav-label"><i class="fas fa-arrow-left"></i> Previous</div>
-            <div class="nav-title">{{ page.previous.title }}</div>
-          </a>
-        {% else %}
-          <div class="nav-link placeholder"></div>
-        {% endif %}
+  </div>
 
-        {% if page.next.url %}
-          <a class="nav-link next" href="{{ page.next.url | relative_url }}">
-            <div class="nav-label">Next <i class="fas fa-arrow-right"></i></div>
-            <div class="nav-title">{{ page.next.title }}</div>
-          </a>
-        {% endif %}
-      </div>
-    </nav>
-
-  </footer>
-
+  <div class="post-back-home">
+    <a href="{{ '/' | relative_url }}" class="back-home-btn">
+      <i class="fas fa-home"></i> 返回首页
+    </a>
+  </div>
 </article>
-
-<!-- 4. CSS 样式 (已添加 TOC 部分) -->
-<style>
-  /* ====================
-     Header Styling
-     ==================== */
-  .post-header {
-    margin-bottom: 2.5rem;
-    text-align: left;
-  }
-
-  .post-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    margin-bottom: 0.8rem;
-    line-height: 1.2;
-    color: var(--heading-color);
-    letter-spacing: -0.02em;
-  }
-
-  .post-meta {
-    font-family: 'Lato', sans-serif;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-size: 0.9rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center; /* 垂直居中 */
-    position: relative; /* 为下拉菜单定位做准备 */
-  }
-
-  .meta-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .meta-item i {
-    font-size: 0.85em;
-    opacity: 0.8;
-  }
-
-/* --- 桌面端样式 (保持悬浮下拉) --- */
-.meta-toc {
-    position: relative;
-    cursor: pointer;
-}
-.meta-toc summary {
-    list-style: none;
-    outline: none;
-}
-.meta-toc summary::-webkit-details-marker { display: none; }
-
-.toc-content {
-    /* 桌面端：绝对定位，悬浮在上方，不推挤内容 */
-    position: absolute;
-    top: 140%;
-    left: 0;
-    z-index: 1000;
-    background: var(--code-bg, #fff);
-    border: 1px solid var(--border-color, #eaeaea);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    padding: 15px;
-    border-radius: 8px;
-    min-width: 240px;
-    max-height: 60vh;
-    overflow-y: auto;
-}
-
-/* --- 移动端样式：嵌入式展开 (Inline Expansion) --- */
-@media (max-width: 1024px) {
-    
-    /* 1. 让 meta 容器允许换行，这样目录展开时可以占据一行 */
-    .post-meta {
-        flex-wrap: wrap; 
-        position: relative; /* 建立定位上下文 */
-    }
-
-    /* 2. 目录按钮容器：在手机上宽度自适应 */
-    .meta-toc-container {
-        /* 如果希望点击展开后目录占满整行，可以不设特殊限制，
-           或者设为 width: 100% (这会把按钮也强制换行，看你喜好)。
-           这里保持默认 flex 行为即可。 */
-    }
-
-    /* 3. 目录内容框：核心修改 */
-    .toc-content {
-        /* [关键] 改为 static 或 relative，使其占据文档流空间 */
-        position: relative; 
-        top: auto; 
-        left: auto;
-        
-        /* 样式调整：使其看起来像嵌入在页面里的 */
-        width: 100%; /* 宽度撑满 */
-        margin-top: 15px; /* 与上方按钮拉开距离 */
-        box-shadow: none; /* 去掉悬浮阴影 */
-        border: 1px solid var(--border-color);
-        background: var(--code-bg, #f9f9f9); /*稍微淡一点的背景区分 */
-        max-height: none; /* 取消高度限制，或者设一个较大的值 */
-        z-index: 1;
-        
-        /* 强制目录在 flex 容器中换行显示 (Trick) */
-        /* 由于它是 details 的子元素，我们通常需要让 details 变宽 */
-    }
-
-    /* 4. [特殊处理] 强制目录展开时独占一行 */
-    /* 当 details 被打开(open)时，强制它占据 100% 宽度 */
-    .meta-toc[open] {
-        width: 100%;
-        flex-basis: 100%; /* Flex 布局中强制换行 */
-        margin-top: 10px;
-    }
-    
-    /* 打开时，把 summary (按钮) 也稍微美化一下，比如加个底边框 */
-    .meta-toc[open] summary {
-        margin-bottom: 10px;
-        font-weight: bold;
-        color: var(--link-color);
-    }
-}
-
-/* 通用列表样式 */
-.toc-list { list-style: none; padding: 0; margin: 0; }
-.toc-item a { 
-    display: block; 
-    padding: 8px 0; 
-    color: var(--text-color); 
-    text-decoration: none; 
-    border-bottom: 1px dashed var(--border-color);
-}
-.toc-item:last-child a { border-bottom: none; }
-.toc-h2 { margin-left: 10px; }
-.toc-h3 { margin-left: 20px; opacity: 0.8; font-size: 0.9em; }
-
-  /* ====================
-     Content Styling
-     ==================== */
-  .post-content {
-    line-height: 1.8;
-    font-size: 1.05rem;
-    margin-bottom: 4rem;
-    color: var(--text-color);
-  }
-  
-  .post-content h2 { margin-top: 2.5rem; position: relative; }
-  .post-content h3 { margin-top: 2rem; position: relative; }
-
-  /* ====================
-     Footer & Tags (保持不变)
-     ==================== */
-  .post-footer { margin-top: 3rem; }
-  
-  .post-tags {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2rem;
-  }
-
-  .tag-icon { color: var(--text-color); opacity: 0.5; margin-right: 5px; }
-
-  .tag-pill {
-    display: inline-block;
-    background: var(--code-bg, #f6f8fa);
-    color: var(--text-color);
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border: 1px solid var(--border-color, #eaeaea);
-    transition: all 0.2s ease;
-  }
-
-  .tag-pill:hover {
-    background: var(--link-color);
-    color: #fff;
-    border-color: var(--link-color);
-    transform: translateY(-1px);
-    cursor: default;
-  }
-
-  .footer-divider {
-    border: 0;
-    height: 1px;
-    background: var(--border-color);
-    margin: 2rem 0;
-    opacity: 0.5;
-  }
-
-  .nav-links { display: flex; justify-content: space-between; gap: 20px; }
-
-  .nav-link {
-    flex: 1;
-    min-width: 0;
-    padding: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    text-decoration: none !important;
-    transition: all 0.2s ease;
-    background: transparent;
-  }
-
-  .nav-link:hover {
-    border-color: var(--link-color);
-    background: var(--code-bg);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-
-  .nav-link.next { text-align: right; }
-  
-  .nav-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-color);
-    opacity: 0.6;
-    margin-bottom: 5px;
-    font-weight: 700;
-  }
-
-  .nav-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--link-color);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .placeholder { border: none; pointer-events: none; }
-
-  @media (max-width: 1024px) {
-    .post-title { font-size: 1.8rem; }
-    .nav-links { flex-direction: column; }
-    .nav-link.next { text-align: left; }
-  }
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const tocContainer = document.getElementById('toc-container');
-  const tocContent = document.getElementById('toc-content');
-  const postContent = document.querySelector('.js-toc-content');
-  const details = document.querySelector('.meta-toc');
-
-  if (!tocContainer || !tocContent || !postContent) return;
-
-  // --- 1. 生成目录 ---
-  const headers = postContent.querySelectorAll('h2, h3');
-  if (headers.length === 0) return;
-
-  const ul = document.createElement('ul');
-  ul.className = 'toc-list';
-
-  headers.forEach((header, index) => {
-    let id = header.id;
-    if (!id) { id = 'toc-header-' + index; header.id = id; }
-    
-    const li = document.createElement('li');
-    li.className = 'toc-item toc-' + header.tagName.toLowerCase();
-    
-    const a = document.createElement('a');
-    a.href = '#' + id;
-    a.textContent = header.textContent;
-    
-    // 点击链接：平滑滚动
-    a.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // 如果你想点击后自动收起目录，保留下面这行；如果不希望收起，删除这行
-        if (details) details.removeAttribute('open'); 
-
-        const target = document.getElementById(id);
-        if(target) target.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    li.appendChild(a);
-    ul.appendChild(li);
-  });
-  
-  tocContent.appendChild(ul);
-  tocContainer.style.display = 'inline-flex'; // 显示按钮
-});
-</script>
