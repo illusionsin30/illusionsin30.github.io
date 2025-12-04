@@ -16,18 +16,23 @@ title: Home
 ## 笔记导航
 ### 学习笔记
 #### Topology
-[Week10: 同伦与基本群](/topology/TopoWeek10)
+[**Week10**: 同伦与基本群](/topology/TopoWeek10)
+[**Week11**: 基本群与 $S^1$ 的基本群](/topology/TopoWeek11)
 
 ### Machine Learning 基础学习
 
-[Transformer架构解读](/ML/transformer)
-[GPT与BERT架构](/ML/GPTandBert)
+[Transformer架构解读(待更新)](/ML/transformer)
+[GPT与BERT架构(待更新)](/ML/GPTandBert)
 
 ### 前沿论文阅读笔记
 
-#### 模型架构优化
+#### 模型量化 Quantization
 [\[**AAAI 2025 oral**\]MPQ-DM: Mixed Precision Quantization for Extremely Low Bit Diffusion Models](/articles/MPQ-DM)
 [\[**ECCV 2024**\]MixDQ: Memory-Efficient Few-Step Text-to-Image Diffusion Models with Metric-Decoupled Mixed Precision Quantization](/articles/MixDQ)
+
+#### 线性注意力 Linear attention
+[\[**Google**\]Learning without training: The implicit dynamics of in-context learning](/articles/LWT)
+
 
 目前很多笔记仍在进行中，主播努力学习ing...
 
