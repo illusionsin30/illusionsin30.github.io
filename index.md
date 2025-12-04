@@ -16,13 +16,13 @@ title: Home
 ## 笔记导航
 ### 学习笔记
 #### Topology
-[Week10: 同伦与基本群](/topology/TopoWeek10)
-[Week11: 基本群](/topology/TopoWeek11)
+[**Week10**: 同伦与基本群](/topology/TopoWeek10)
+[**Week11**: 基本群与 $S^1$ 的基本群](/topology/TopoWeek11)
 
 ### Machine Learning 基础学习
 
-[Transformer架构解读](/ML/transformer)
-[GPT与BERT架构](/ML/GPTandBert)
+[Transformer架构解读(待更新)](/ML/transformer)
+[GPT与BERT架构(待更新)](/ML/GPTandBert)
 
 ### 前沿论文阅读笔记
 
