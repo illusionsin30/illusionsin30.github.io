@@ -17,6 +17,7 @@ title: Home
 ### 学习笔记
 #### Topology
 [Week10: 同伦与基本群](/topology/TopoWeek10)
+[Week11: 基本群](/topology/TopoWeek11)
 
 ### Machine Learning 基础学习
 
