@@ -20,6 +20,9 @@ title: Home
 [**Week12**: 基本群与 $S^1$ 的基本群](/topology/TopoWeek12)
 [**Week13**：$S^1$ 基本群、$S^n$ 基本群和 $T^2$ 基本群](/topology/TopoWeek13)
 
+#### Applied Stochastic Process
+[**Chap1**: 概率论基础](/StocProcess/Chap1)
+
 ### Machine Learning 基础学习
 
 [Transformer架构解读(待更新)](/ML/transformer)
