@@ -2,36 +2,38 @@
 // 1. CSS 变量定义 (Modern Minimalist Palette)
 // =============================================
 :root {
-  // Light Mode
+  /* --- Light Mode: 极简低饱和钢蓝 --- */
   --bg-color: #ffffff;
-  --bg-secondary: #f8fafc; // Slate 50
-  --text-primary: #1e293b; // Slate 800
-  --text-secondary: #64748b; // Slate 500
-  --accent-color: #2563eb; // Royal Blue
-  --border-color: #e2e8f0; // Slate 200
-  --hover-bg: #f1f5f9;     // Slate 100
-  --code-bg: #f8fafc;
-  --card-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  --bg-secondary: #f4f7fa;    /* 极淡的冷烟蓝，非常柔和 */
+  --text-primary: #2d3748;    /* 深灰蓝色，增加阅读质感 */
+  --text-secondary: #718096;  /* 辅助文字色 */
   
-  // Sidebar
-  --sidebar-bg: #ffffff;
-  --sidebar-border: #e2e8f0;
+  /* 核心修改：低饱和度的钢蓝色 */
+  --accent-color: #526d82;    /* 莫兰迪蓝：带灰度的蓝，不刺眼且高级 */
+  --accent-light: #dde6ed;    /* 极其淡的辅助蓝，用于表头或背景 */
+  --accent-dark: #27374d;     /* 深色强调蓝 */
+  
+  --border-color: #e2e8f0;    /* 极细边框 */
+  --hover-bg: #edf2f7;        /* 悬停时的中性色 */
+  --code-bg: #f8fafc;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="dark"] {
-  // Dark Mode
-  --bg-color: #0f172a;
-  --bg-secondary: #1e293b;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --accent-color: #60a5fa;
-  --border-color: #1e293b;
-  --hover-bg: #334155;
-  --code-bg: #1e293b;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-
-  --sidebar-bg: #0f172a;
-  --sidebar-border: #1e293b;
+  /* --- Dark Mode: 深邃午夜蓝 --- */
+  --bg-color: #0f172a;       /* 深蓝黑 */
+  --bg-secondary: #1e293b;   /* 深蓝灰色背景 */
+  --text-primary: #cbd5e1;   /* 浅灰蓝文字 */
+  --text-secondary: #94a3b8; 
+  
+  --accent-color: #9db2bf;   /* 暗黑模式下使用更亮的低饱和蓝 */
+  --accent-light: #334155;   
+  --accent-dark: #dde6ed;
+  
+  --border-color: #334155;   /* 深色描边 */
+  --hover-bg: #1e293b;
+  --code-bg: #0f172a;
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 // =============================================
@@ -126,20 +128,103 @@ a { color: var(--accent-color); text-decoration: none; }
   margin-top: auto;
   hr { border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0; }
   .meta-info { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+
   .toc-container {
     margin-top: 2rem;
+    
+    /* 目录标题：CONTENTS / 目录 */
     h3 { 
-      color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.8rem; 
-      text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+      color: var(--text-secondary); 
+      font-size: 0.75rem; 
+      margin-bottom: 1.2rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
+      font-weight: 700;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      &::after { /* 装饰线 */
+        content: ""; flex: 1; height: 1px; background: var(--border-color); margin-left: 10px;
+      }
     }
-    #toc ul {
-      list-style: none; padding-left: 12px;
-      border-left: 2px solid var(--border-color);
-      li { margin: 8px 0; }
+
+    #toc {
+      /* 基础列表容器 */
+      ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+        border-left: 1px solid var(--border-color); /* 左侧统一引导线 */
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.4;
+        position: relative;
+      }
+
       a {
-        color: var(--text-secondary); font-size: 0.85rem; display: block;
-        transition: all 0.2s;
-        &:hover, &.active { color: var(--accent-color); font-weight: 600; transform: translateX(3px); }
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: block;
+        padding: 4px 0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        white-space: nowrap;      /* 强制单行 */
+        overflow: hidden;         /* 溢出隐藏 */
+        text-overflow: ellipsis;  /* 省略号 */
+
+        &:hover {
+          color: var(--accent-color);
+          transform: translateX(4px);
+        }
+
+        &.active {
+          color: var(--accent-color);
+          font-weight: 600;
+          /* 激活时左侧加粗线条效果 */
+          &::before {
+            content: "";
+            position: absolute;
+            left: -1px; /* 压在 border-left 上 */
+            width: 2px;
+            height: 60%;
+            top: 20%;
+            background-color: var(--accent-color);
+          }
+        }
+      }
+
+      /* =============================================
+         层级缩进逻辑 (1~4级标题)
+         ============================================= */
+      
+      /* H1 - 通常是文章标题或概览 */
+      .toc-h1 {
+        padding-left: 12px;
+        a { 
+          font-size: 0.9rem; 
+          font-weight: 600; 
+          color: var(--text-primary); 
+        }
+      }
+
+      /* H2 - 大章节 */
+      .toc-h2 {
+        padding-left: 12px;
+        a { font-size: 0.85rem; }
+      }
+
+      /* H3 - 小节 */
+      .toc-h3 {
+        padding-left: 24px;
+        a { font-size: 0.8rem; opacity: 0.9; }
+      }
+
+      /* H4 - 细节 */
+      .toc-h4 {
+        padding-left: 36px;
+        a { font-size: 0.75rem; opacity: 0.7; }
       }
     }
   }
@@ -232,6 +317,61 @@ a { color: var(--accent-color); text-decoration: none; }
 // 6. 文章内容 & 其他
 // =============================================
 .post-list-container { display: flex; flex-direction: column; gap: 2rem; }
+
+/* 1. 响应式容器：确保父级容器允许横向滚动 */
+.table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+    border-radius: 8px; /* 可选：增加圆角让视觉更现代 */
+}
+
+/* 2. 表格基础样式 */
+.post-body table {
+    min-width: 600px; /* 确保在窄屏下不被压缩 */
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* 3. 表头样式 */
+.post-body table thead tr {
+    /* 使用主题色作为表头背景 */
+    background-color: var(--accent-color);
+    /* 如果明亮模式下蓝色太深，文字强制白色；暗黑模式下 accent-color 通常较浅，文字也清晰 */
+    color: #ffffff; 
+    text-align: left;
+}
+
+/* 4. 单元格边框与内边距 */
+.post-body table td, 
+.post-body table th {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+}
+
+/* 5. 隔行变色：使用次级背景色 */
+.post-body table tbody tr:nth-child(even) {
+    background-color: var(--bg-secondary);
+}
+
+/* 6. 悬停效果：增强交互感 */
+.post-body table tbody tr:hover {
+    background-color: var(--hover-bg);
+    transition: background-color 0.2s ease;
+}
+
+/* 7. 针对暗黑模式的细微调整 (如果需要) */
+[data-theme="dark"] .post-body table thead tr {
+    /* 暗黑模式下，如果觉得全蓝背景太突兀，可以改用更深的背景或仅保留边框 */
+    background-color: var(--bg-secondary);
+    color: var(--accent-color); /* 文字变蓝 */
+    border-bottom: 2px solid var(--accent-color);
+}
 
 // --- 文章卡片 (普通博文列表) ---
 .post-card {

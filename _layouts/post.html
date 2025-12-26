@@ -3,29 +3,35 @@ layout: default
 ---
 
 <article class="post-content">
+  <!-- ============================================================
+       1. 文章头部：显示标题、日期及图标
+       ============================================================ -->
   <header class="post-header">
     <h1 class="post-title">{{ page.title }}</h1>
-    <p class="post-date"><i class="far fa-calendar-alt"></i> {{ page.date | date: "%Y-%m-%d" }}</p>
+    <p class="post-date">
+      <i class="far fa-calendar-alt"></i> {{ page.date | date: "%Y-%m-%d" }}
+    </p>
   </header>
 
+  <!-- ============================================================
+       2. 文章正文：Markdown 渲染后的 HTML 内容
+       ============================================================ -->
   <div class="post-body">
     {{ content }}
   </div>
-
-  <!-- 
-    === 核心修复逻辑：基于子文件夹的独立索引 === 
-  -->
+  
+  <!-- ============================================================
+       3. 同目录文章导航：筛选物理路径相同的文章并实现上/下篇跳转
+       ============================================================ -->
   <div class="post-navigation">
-    <!-- 1. 获取当前文章的目录路径 (不包含文件名) -->
+    <!-- A. 获取当前目录路径 -->
     {% assign path_array = page.path | split: '/' %}
     {% assign array_size = path_array | size %}
     {% assign dir_depth = array_size | minus: 1 %}
     {% assign current_dir = path_array | slice: 0, dir_depth | join: '/' %}
 
-    <!-- 2. 创建一个空数组用于存放同目录的文章 -->
+    <!-- B. 筛选同目录下的文章 -->
     {% assign sibling_posts = "" | split: "" %}
-
-    <!-- 3. 遍历所有文章，筛选出物理路径相同的文章 -->
     {% for post in site.posts %}
       {% assign post_path_array = post.path | split: '/' %}
       {% assign post_array_size = post_path_array | size %}
@@ -37,15 +43,7 @@ layout: default
       {% endif %}
     {% endfor %}
 
-    <!-- 
-      注意：site.posts 默认是按时间【从新到旧】排序的。
-      筛选出的 sibling_posts 依然保持这个顺序：
-      Index 0: 最新 (Newest)
-      ...
-      Index N: 最旧 (Oldest)
-    -->
-
-    <!-- 4. 在筛选后的数组中找到当前文章的索引 -->
+    <!-- C. 确定当前文章在同级数组中的位置 (site.posts 默认为日期倒序) -->
     {% assign currIndex = -1 %}
     {% for post in sibling_posts %}
       {% if post.path == page.path %}
@@ -53,14 +51,12 @@ layout: default
       {% endif %}
     {% endfor %}
 
-    <!-- 5. 计算逻辑索引 -->
-    <!-- 下一篇 (更近的日期) = 索引减 1 -->
+    <!-- D. 计算索引：上一篇(旧文章) = 索引+1, 下一篇(新文章) = 索引-1 -->
     {% assign nextIndex = currIndex | minus: 1 %}
-    <!-- 上一篇 (更远的日期) = 索引加 1 -->
     {% assign prevIndex = currIndex | plus: 1 %}
 
-    <!-- 6. 渲染按钮 -->
-    <!-- 上一篇 (旧文章) -->
+    <!-- E. 渲染导航按钮 -->
+    <!-- 上一篇按钮 (旧文章) -->
     {% if prevIndex < sibling_posts.size %}
       {% assign prev_post = sibling_posts[prevIndex] %}
       <a class="nav-btn prev" href="{{ prev_post.url | relative_url }}">
@@ -71,7 +67,7 @@ layout: default
       <div class="nav-btn-placeholder"></div>
     {% endif %}
 
-    <!-- 下一篇 (新文章) -->
+    <!-- 下一篇按钮 (新文章) -->
     {% if nextIndex >= 0 %}
       {% assign next_post = sibling_posts[nextIndex] %}
       <a class="nav-btn next" href="{{ next_post.url | relative_url }}">
@@ -81,12 +77,37 @@ layout: default
     {% else %}
       <div class="nav-btn-placeholder"></div>
     {% endif %}
-
   </div>
 
+  <!-- ============================================================
+       4. 底部工具栏：返回首页
+       ============================================================ -->
   <div class="post-back-home">
     <a href="{{ '/' | relative_url }}" class="back-home-btn">
       <i class="fas fa-home"></i> 返回首页
     </a>
   </div>
+
+  <!-- ============================================================
+       5. 脚本：美化 Markdown 表格并添加移动端横向滚动容器
+       ============================================================ -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 获取正文内所有的表格
+      const tables = document.querySelectorAll('.post-body table');
+      
+      tables.forEach(table => {
+        // 1. 创建包装容器 div
+        const wrapper = document.createElement('div');
+        // 2. 添加类名以供 CSS 设置 overflow-x: auto
+        wrapper.className = 'table-responsive-wrapper';
+        wrapper.style.overflowX = 'auto';
+        wrapper.style.margin = '1.5rem 0';
+        
+        // 3. 将容器插入 DOM 并将表格移入其中
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      });
+    });
+  </script>
 </article>
