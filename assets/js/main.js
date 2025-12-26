@@ -1,28 +1,45 @@
 document.addEventListener("DOMContentLoaded", function() {
-  // 1. TOC 逻辑 (保持不变)
+  // 1. 获取容器
   const tocContainer = document.getElementById('toc');
-  const content = document.querySelector('.post-body');
+  // 尝试匹配不同的正文容器类名（适配 Wiki 或 Post）
+  const content = document.querySelector('.post-body') || document.querySelector('.main-content');
 
   if (tocContainer && content) {
-    // ... (保持你之前的 TOC 代码不变) ...
-    // 如果没有 TOC 代码，请把上次回答的 JS 代码复制在这里
-    const headings = content.querySelectorAll('h2, h3');
+    // 【关键修改点】：增加 h1 和 h4 的抓取
+    const headings = content.querySelectorAll('h1, h2, h3, h4');
+    
     if (headings.length > 0) {
       const ul = document.createElement('ul');
+      
       headings.forEach((heading, index) => {
+        // 生成唯一 ID（如果标题没有 ID 的话）
         const id = heading.id || `heading-${index}`;
         heading.id = id;
+
         const li = document.createElement('li');
+        // 根据标题级别添加类名，例如 toc-h1, toc-h2 等
+        li.classList.add(`toc-li`, `toc-${heading.tagName.toLowerCase()}`);
+
         const a = document.createElement('a');
         a.href = `#${id}`;
         a.textContent = heading.textContent;
-        if(heading.tagName === 'H3') li.style.marginLeft = '15px';
+        
+        // 当点击目录项时，如果是手机端，可以自动关闭侧边栏（可选）
+        a.addEventListener('click', () => {
+           if(window.innerWidth < 850) {
+             // 如果你有侧边栏切换逻辑，可以在这里调用
+           }
+        });
+
         li.appendChild(a);
         ul.appendChild(li);
       });
+      
       tocContainer.appendChild(ul);
     } else {
-      document.querySelector('#toc-container').style.display = 'none';
+      // 如果页面没有标题，隐藏整个目录容器
+      const container = document.querySelector('#toc-container') || document.querySelector('.post-sidebar-meta');
+      if (container) container.style.display = 'none';
     }
   }
 
