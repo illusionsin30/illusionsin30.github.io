@@ -16,23 +16,11 @@ title: Home
 ## 笔记导航
 ### 学习笔记
 #### Topology
-[**Week11**: 同伦与基本群](/topology/TopoWeek11)
-[**Week12**: 基本群与 $S^1$ 的基本群](/topology/TopoWeek12)
-[**Week13**：$S^1$ 基本群、$S^n$ 基本群和 $T^2$ 基本群](/topology/TopoWeek13)
-[**Week14**(待完善)](/topology/TopoWeek14)
-[**Week15**](/topology/TopoWeek15)
+[第一章](/topo/finals/chap1)
 
-#### Applied Stochastic Process
-[**Chap1**: 概率论基础](/StocProcess/Chap1)
-[**Chap6**: 连续参数 Markov 链(待更新)](/StocProcess/Chap6)
+### Machine Learning 机器学习
 
-#### Introduction of Modern Biology
-[**Final Review**(持续更新中...)](/Bio)
-
-### Machine Learning 基础学习
-
-[Transformer架构解读(待更新)](/ML/transformer)
-[GPT与BERT架构(待更新)](/ML/GPTandBert)
+Coming Soon in Next Semester...
 
 ### 前沿论文阅读笔记
 
@@ -42,7 +30,6 @@ title: Home
 
 #### 线性注意力 Linear attention
 [\[**Google**\]Learning without training: The implicit dynamics of in-context learning](/articles/LWT)
-
 
 目前很多笔记仍在进行中，主播努力学习ing...
 
