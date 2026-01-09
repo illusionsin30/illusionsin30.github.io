@@ -15,8 +15,9 @@ title: Home
 
 ## 笔记导航
 ### 学习笔记
-#### Topology
-[第一章](/topo/finals/chap1)
+#### Topology (for final)
+[第一章：拓扑空间与连续映射](/topo/finals/chap1)
+[第二章：几个重要的拓扑性质](/topo/finals/chap2)
 
 ### Machine Learning 机器学习
 
