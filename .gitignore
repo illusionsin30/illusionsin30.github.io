@@ -1,5 +1,13 @@
 ignore_ssl.rb
 Gemfile.lock
-.bundle
-_site
-vendor
+.bundle/
+vendor/
+_site/
+
+script/
+past_index.md
+*.gemspec
+
+script
+thumbnail.png
+#assets
