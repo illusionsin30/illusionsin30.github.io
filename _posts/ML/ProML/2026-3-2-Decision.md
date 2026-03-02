@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Week 1 Statistical Decision Theory 统计决策理论
-date: 2025-11-12
+date: 2026-3-2
 permalink: /ML/ProML/Decision
 toc: true
 ---
@@ -53,7 +53,7 @@ $$
 > **Theorem**: 给定确定函数 $M$ (fixed function, 不随样本选取改变) 和随机函数 $M\_n$ (random function, 意为随样本选取随机性发生变化的函数)，若 $\forall \epsilon > 0$，有
 >
 > $$
->   \underset{\theta \in \Theta}{\sup} |M_n(\theta) - M(\theta)| \overset{P}{\to} 0, \underset{\{\theta | d(\theta, \theta_0) \geq \epsilon\}} M(\theta) < M(\theta_0)
+>   \underset{\theta \in \Theta}{\sup} |M_n(\theta) - M(\theta)| \overset{P}{\to} 0, \hspace{2ex} \underset{\{\theta | d(\theta, \theta_0) \geq \epsilon\}} M(\theta) < M(\theta_0)
 > $$
 >
 > 则对任意满足 $M\_n(\hat{\theta}\_n) \geq M\_n(\theta\_0) - o_p(1)$ 的估计量 $\hat{\theta}\_n$ 依概率收敛到 $\theta\_0$。
@@ -102,7 +102,7 @@ $$
 
 $$
 \begin{align*}
-    f\_0(X) &=  &= \underset{f}{\argmin} E[|Y - f(X)| | X = x] \\
+    f\_0(X) &= \underset{f}{\argmin} E[|Y - f(X)| | X = x] \\
     &= \underset{f}{\argmin} \int_{-\infty}^{f(x)} (f(x) - y)p_{Y|X}(y | x) dy + \int_{f(x)}^{\infty} (y - f(x))p_{Y|X}(y | x) dy
 \end{align*}
 $$
@@ -111,7 +111,7 @@ $$
 
 $$
 \begin{align*}
-    \frac{\partial}{\partial (f(x))} \left( \int_{-\infty}^{f(x)} (f(x) - y)p_{Y|X}(y | x) dy + \int_{f(x)}^{\infty} (y - f(x))p_{Y|X}(y | x) dy \right) \\
+    &\frac{\partial}{\partial (f(x))} \left( \int_{-\infty}^{f(x)} (f(x) - y)p_{Y|X}(y | x) dy + \int_{f(x)}^{\infty} (y - f(x))p_{Y|X}(y | x) dy \right) \\
     =& 2 \int_{-\infty}^{f(X)} p_{Y | X}(y | x) dy - 1 \\
     =& 0
 \end{align*}
@@ -124,7 +124,7 @@ $$
 
 $$
 \begin{align*}
-    E[(Y - \hat{f}_{\mathcal{D}}(X))^2] \\
+    &E[(Y - \hat{f}_{\mathcal{D}}(X))^2] \\
     =& E[(f(X) + \varepsilon - E[\hat{f}_\mathcal{D}(X)] + E[\hat{f}_\mathcal{D}(X)] - \hat{f}_{\mathcal{D}}(X))^2] \\
     &\text{(代入模型的期望预测，一加一减)}\\
     =& E(\varepsilon^2) + E\left[(f - E(f_{\mathcal{D}}))^2\right] + E\left[(E(\hat{f}_{\mathcal{D}}) - f_{\mathcal{D}})^2\right] \\
