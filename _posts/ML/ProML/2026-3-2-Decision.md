@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Week 1 Statistical Decision Theory 统计决策理论
+title: Week 2 Statistical Decision Theory 统计决策理论
 date: 2026-3-2
 permalink: /ML/ProML/Decision
 toc: true

@@ -17,7 +17,7 @@ title: Home
 ### 学习笔记
 ### Machine Learning 机器学习
 [统计机器学习 Statistical Machine Learning](/ML/ProML/index)
-
+[模式识别与机器学习 Pattern Recognition & Machine Learning](/ML/PRML/index)
 
 ### 前沿论文阅读笔记
 
